@@ -12,8 +12,8 @@ ColorKinect2Stream::ColorKinect2Stream(Kinect2StreamImpl* pStreamImpl)
 {
 	m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_RGB888;
 	m_videoMode.fps         = DEFAULT_FPS;
-	m_videoMode.resolutionX = 1920;
-	m_videoMode.resolutionY = 1080;
+	m_videoMode.resolutionX = 960;
+	m_videoMode.resolutionY = 540;
   m_frameReader = NULL;
   m_buffer = new RGBQUAD[1920*1080];
 
@@ -63,9 +63,7 @@ void ColorKinect2Stream::frameReady(unsigned long timestamp)
     hr = frame->AccessRawUnderlyingBuffer(&bufferSize, reinterpret_cast<BYTE**>(&data_in));
   }
   else {
-    hr = frame->CopyConvertedFrameDataToArray(m_videoMode.resolutionX*m_videoMode.resolutionY*sizeof(RGBQUAD),
-                                              reinterpret_cast<BYTE*>(m_buffer),
-                                              ColorImageFormat_Bgra);
+    hr = frame->CopyConvertedFrameDataToArray(1920*1080*sizeof(RGBQUAD), reinterpret_cast<BYTE*>(m_buffer), ColorImageFormat_Bgra);
 	  data_in = m_buffer;
   }
   if (FAILED(hr)) {
@@ -102,49 +100,25 @@ void ColorKinect2Stream::frameReady(unsigned long timestamp)
   pFrame->timestamp = timestamp;
 
 	OniRGB888Pixel* data_out = reinterpret_cast<OniRGB888Pixel*>(pFrame->data);
-	if (!m_cropping.enabled)
-	{
-		RGBQUAD* data_in_end = data_in + (m_videoMode.resolutionY * m_videoMode.resolutionX);
-		while (data_in < data_in_end)
-		{
-			data_out->r = data_in->rgbRed;
-			data_out->g = data_in->rgbGreen;
-			data_out->b = data_in->rgbBlue;
-			++data_in;
-			++data_out;
-		}
-	}
-	else
-	{
-		int cropY = m_cropping.originY;
-		while (cropY < m_cropping.originY + m_cropping.height)
-		{
-		  int cropX = m_cropping.originX;
-			while (cropX < m_cropping.originX + m_cropping.width)
-			{
-				RGBQUAD* iter = data_in + (cropY * m_videoMode.resolutionX + cropX++);
-				data_out->b = iter->rgbBlue;
-				data_out->r = iter->rgbRed;
-				data_out->g = iter->rgbGreen;
-				data_out++;
-			}
-			cropY++;
-		}
-	}
+  const int xStride = 1920/m_videoMode.resolutionX;
+  const int yStride = 1080/m_videoMode.resolutionY;
+  const int frameX = pFrame->cropOriginX * xStride;
+  const int frameY = pFrame->cropOriginY * yStride;
+  const int frameWidth = pFrame->width * xStride;
+  const int frameHeight = pFrame->height * yStride;
+  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+      RGBQUAD* iter = data_in + (y*1920 + x);
+			data_out->b = iter->rgbBlue;
+			data_out->r = iter->rgbRed;
+			data_out->g = iter->rgbGreen;
+			data_out++;
+    }
+  }
 
 
   // Emit OniFrame and clean
   frame->Release();
 	raiseNewFrame(pFrame);
 	getServices().releaseFrame(pFrame);
-}
-
-OniStatus ColorKinect2Stream::SetVideoMode(OniVideoMode* videoMode)
-{
-	if (!m_pStreamImpl->isRunning())
-	{
-    delete[] m_buffer;
-    m_buffer = new RGBQUAD[videoMode->resolutionX * videoMode->resolutionY];
-	}
-	return BaseKinect2Stream::SetVideoMode(videoMode);
 }

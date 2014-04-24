@@ -24,12 +24,17 @@ Kinect2Device::Kinect2Device(IKinectSensor* pKinectSensor)
 	m_sensors[0].pSupportedVideoModes[0].resolutionY = 424;
 
 	m_sensors[1].sensorType = ONI_SENSOR_COLOR;
-	m_sensors[1].numSupportedVideoModes = 1;
-	m_sensors[1].pSupportedVideoModes = XN_NEW_ARR(OniVideoMode, 1);
+	m_sensors[1].numSupportedVideoModes = 2;
+	m_sensors[1].pSupportedVideoModes = XN_NEW_ARR(OniVideoMode, 2);
 	m_sensors[1].pSupportedVideoModes[0].pixelFormat = ONI_PIXEL_FORMAT_RGB888;
 	m_sensors[1].pSupportedVideoModes[0].fps         = DEFAULT_FPS;
-	m_sensors[1].pSupportedVideoModes[0].resolutionX = 1920;
-	m_sensors[1].pSupportedVideoModes[0].resolutionY = 1080;
+	m_sensors[1].pSupportedVideoModes[0].resolutionX = 960;
+	m_sensors[1].pSupportedVideoModes[0].resolutionY = 540;
+
+	m_sensors[1].pSupportedVideoModes[1].pixelFormat = ONI_PIXEL_FORMAT_RGB888;
+	m_sensors[1].pSupportedVideoModes[1].fps         = DEFAULT_FPS;
+	m_sensors[1].pSupportedVideoModes[1].resolutionX = 1920;
+	m_sensors[1].pSupportedVideoModes[1].resolutionY = 1080;
 
 	m_sensors[2].sensorType = ONI_SENSOR_IR;
 	m_sensors[2].numSupportedVideoModes = 1;

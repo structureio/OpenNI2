@@ -126,58 +126,47 @@ void Kinect2StreamImpl::mainLoop()
 
 XnDouble Kinect2StreamImpl::getHorizontalFov()
 {
-  if (!m_pKinectSensor) {
+  IFrameDescription* frameDescription = NULL;
+  if (m_sensorType == ONI_SENSOR_DEPTH && m_imageRegistrationMode == ONI_IMAGE_REGISTRATION_DEPTH_TO_COLOR) {
+    frameDescription = getFrameDescription(ONI_SENSOR_COLOR);
+  }
+  else {
+    frameDescription = getFrameDescription(m_sensorType);
+  }
+
+  if (frameDescription == NULL) {
     return 0;
   }
 
-  IColorFrameSource* frameSource;
-  HRESULT hr = m_pKinectSensor->get_ColorFrameSource(&frameSource);
-  if (FAILED(hr)) {
-    return 0;
-  }
-  
-  IFrameDescription* frameDescription;
-  hr = frameSource->get_FrameDescription(&frameDescription);
-  if (FAILED(hr)) {
-    frameSource->Release();
-    return 0;
-  }
-  
   float fov;
-  hr = frameDescription->get_HorizontalFieldOfView(&fov);
+  HRESULT hr = frameDescription->get_HorizontalFieldOfView(&fov);
   frameDescription->Release();
-  frameSource->Release();
   if (FAILED(hr)) {
     return 0;
   }
-
   return fov;
 }
 
 XnDouble Kinect2StreamImpl::getVerticalFov()
 {
-  if (!m_pKinectSensor) {
+  IFrameDescription* frameDescription = NULL;
+  if (m_sensorType == ONI_SENSOR_DEPTH && m_imageRegistrationMode == ONI_IMAGE_REGISTRATION_DEPTH_TO_COLOR) {
+    frameDescription = getFrameDescription(ONI_SENSOR_COLOR);
+  }
+  else {
+    frameDescription = getFrameDescription(m_sensorType);
+  }
+
+  if (frameDescription == NULL) {
     return 0;
   }
 
-  IColorFrameSource* frameSource;
-  HRESULT hr = m_pKinectSensor->get_ColorFrameSource(&frameSource);
-  if (FAILED(hr)) {
-    return 0;
-  }
-  
-  IFrameDescription* frameDescription;
-  hr = frameSource->get_FrameDescription(&frameDescription);
-  if (FAILED(hr)) {
-    return 0;
-  }
-  
   float fov;
-  hr = frameDescription->get_VerticalFieldOfView(&fov);
+  HRESULT hr = frameDescription->get_VerticalFieldOfView(&fov);
+  frameDescription->Release();
   if (FAILED(hr)) {
     return 0;
   }
-
   return fov;
 }
 
@@ -188,8 +177,8 @@ void Kinect2StreamImpl::setDefaultVideoMode()
 	case ONI_SENSOR_COLOR:
 		m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_RGB888;
 		m_videoMode.fps         = DEFAULT_FPS;
-		m_videoMode.resolutionX = 1920;
-		m_videoMode.resolutionY = 1080;
+		m_videoMode.resolutionX = 960;
+		m_videoMode.resolutionY = 540;
 		break;
 
 	case ONI_SENSOR_DEPTH:
@@ -209,6 +198,55 @@ void Kinect2StreamImpl::setDefaultVideoMode()
 	default:
 		break;
 	}
+}
+
+IFrameDescription* Kinect2StreamImpl::getFrameDescription(OniSensorType sensorType)
+{
+  if (!m_pKinectSensor) {
+    return NULL;
+  }
+  
+  HRESULT hr;
+  IFrameDescription* frameDescription;
+
+  if (sensorType == ONI_SENSOR_COLOR) {
+    IColorFrameSource* frameSource;
+    hr = m_pKinectSensor->get_ColorFrameSource(&frameSource);
+    if (FAILED(hr)) {
+      return NULL;
+    }
+    hr = frameSource->get_FrameDescription(&frameDescription);
+    frameSource->Release();
+    if (FAILED(hr)) {
+      return NULL;
+    }
+  }
+  else if (sensorType = ONI_SENSOR_DEPTH) {
+    IDepthFrameSource* frameSource;
+    hr = m_pKinectSensor->get_DepthFrameSource(&frameSource);
+    if (FAILED(hr)) {
+      return NULL;
+    }
+    hr = frameSource->get_FrameDescription(&frameDescription);
+    frameSource->Release();
+    if (FAILED(hr)) {
+      return NULL;
+    }
+  }
+  else { // ONI_SENSOR_IR
+    IInfraredFrameSource* frameSource;
+    hr = m_pKinectSensor->get_InfraredFrameSource(&frameSource);
+    if (FAILED(hr)) {
+      return NULL;
+    }
+    hr = frameSource->get_FrameDescription(&frameDescription);
+    frameSource->Release();
+    if (FAILED(hr)) {
+      return NULL;
+    }
+  }
+
+  return frameDescription;
 }
 
 XN_THREAD_PROC Kinect2StreamImpl::threadFunc(XN_THREAD_PARAM pThreadParam)

@@ -15,8 +15,6 @@ namespace kinect2_device
 
 	    virtual void frameReady(unsigned long timestamp);
 
-	    virtual OniStatus SetVideoMode(OniVideoMode* pVideoMode);
-
     private:
       IColorFrameReader* m_frameReader;
       RGBQUAD* m_buffer;
