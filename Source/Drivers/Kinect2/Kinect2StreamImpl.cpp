@@ -9,7 +9,7 @@ using namespace xnl;
 
 #define DEFAULT_FPS 30
 
-Kinect2StreamImpl::Kinect2StreamImpl(IKinectSensor *pKinectSensor, OniSensorType sensorType)
+Kinect2StreamImpl::Kinect2StreamImpl(IKinectSensor *pKinectSensor, OniSensorType sensorType, LONGLONG basePerfCounter)
   : m_pKinectSensor(pKinectSensor),
     m_pCoordinateMapper(NULL),
     m_sensorType(sensorType),
@@ -17,13 +17,20 @@ Kinect2StreamImpl::Kinect2StreamImpl(IKinectSensor *pKinectSensor, OniSensorType
     m_running(FALSE),
     m_hStreamHandle(INVALID_HANDLE_VALUE),
     m_hNextFrameEvent(CreateEvent(NULL, TRUE, FALSE, NULL)),
-    m_timestamp(0)
+    m_perfCounter(basePerfCounter),
+    m_perfFreq(1.0)
 {
   HRESULT hr = pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
   if (FAILED(hr)) {
     m_pCoordinateMapper = NULL;
   }
-  m_timestamp = GetTickCount();
+  
+  LARGE_INTEGER qpf = {0};
+  if (QueryPerformanceFrequency(&qpf))
+  {
+      m_perfFreq = double(qpf.QuadPart)/1000000.0;
+  }
+
 	setDefaultVideoMode();
 }
 
@@ -111,14 +118,18 @@ void Kinect2StreamImpl::mainLoop()
 	m_running = TRUE;
 	while (m_running) {
 		//if ( WAIT_OBJECT_0 == WaitForSingleObject(m_hNextFrameEvent, LOOP_TIMEOUT) && m_running) {
+      LARGE_INTEGER qpc = {0};
+      QueryPerformanceCounter(&qpc);
+      double timestamp = static_cast<double>(qpc.QuadPart - m_perfCounter)/m_perfFreq;
+
 			List<BaseKinect2Stream*>::ConstIterator iter = m_streamList.Begin();
 			while( iter != m_streamList.End()) {
 				if (((BaseKinect2Stream*)(*iter))->isRunning()) {
-					((BaseKinect2Stream*)(*iter))->frameReady((GetTickCount() - m_timestamp)*1000);
+          ((BaseKinect2Stream*)(*iter))->frameReady(timestamp);
         }
 				++iter;
 			}
-      Sleep(30);
+      //Sleep(30);
 		//}
 	}
 	return;

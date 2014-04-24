@@ -13,7 +13,7 @@ namespace kinect2_device
 	    IRKinect2Stream(Kinect2StreamImpl* pStreamImpl);
       virtual ~IRKinect2Stream();
 
-	    virtual void frameReady(unsigned long timestamp);
+	    virtual void frameReady(double timestamp);
 
     private:
       IInfraredFrameReader* m_frameReader;

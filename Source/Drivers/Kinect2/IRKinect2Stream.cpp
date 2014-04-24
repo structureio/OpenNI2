@@ -36,7 +36,7 @@ IRKinect2Stream::~IRKinect2Stream()
   }
 }
 
-void IRKinect2Stream::frameReady(unsigned long timestamp)
+void IRKinect2Stream::frameReady(double timestamp)
 {
   // Get Kinect2 frame
   if (!m_frameReader) {
@@ -83,7 +83,7 @@ void IRKinect2Stream::frameReady(unsigned long timestamp)
 	pFrame->videoMode.fps = m_videoMode.fps;
 	pFrame->sensorType = ONI_SENSOR_IR;
 	pFrame->frameIndex = m_frameIdx++;
-  pFrame->timestamp = timestamp;
+  pFrame->timestamp = static_cast<int>(timestamp);
 
 	unsigned short* data_out = reinterpret_cast<unsigned short*>(pFrame->data);
 	if (!m_cropping.enabled)

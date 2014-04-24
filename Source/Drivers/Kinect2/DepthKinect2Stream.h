@@ -12,8 +12,8 @@ namespace kinect2_device
 	    DepthKinect2Stream(Kinect2StreamImpl* pStreamImpl);
       virtual ~DepthKinect2Stream();
 
-	    virtual void frameReady(unsigned long timestamp);
-	
+	    virtual void frameReady(double timestamp);
+
 	    virtual OniStatus getProperty(int propertyId, void* data, int* pDataSize);
 	    virtual OniBool isPropertySupported(int propertyId);
 	    virtual void notifyAllProperties();

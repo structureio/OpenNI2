@@ -13,11 +13,11 @@ namespace kinect2_device
   class Kinect2StreamImpl
   {
     public:
-	    Kinect2StreamImpl(IKinectSensor * pKinectSensor, OniSensorType sensorType);
+	    Kinect2StreamImpl(IKinectSensor * pKinectSensor, OniSensorType sensorType, LONGLONG basePerfCounter);
 	    virtual ~Kinect2StreamImpl();
 
 	    void addStream(BaseKinect2Stream* stream);
-	    void removeStream(BaseKinect2Stream* stream);	
+	    void removeStream(BaseKinect2Stream* stream);
 	    unsigned int getStreamCount();
 
 	    void setVideoMode(OniVideoMode* videoMode);
@@ -58,8 +58,9 @@ namespace kinect2_device
 	    bool m_running;
 	    HANDLE m_hStreamHandle;
 	    HANDLE m_hNextFrameEvent;
-      unsigned long m_timestamp;
-	    XN_THREAD_HANDLE m_threadHandle;	
+      LONGLONG m_perfCounter;
+      double m_perfFreq;
+	    XN_THREAD_HANDLE m_threadHandle;
   };
 } // namespace kinect2_device
 

@@ -22,14 +22,14 @@ namespace kinect2_device
 
 	    virtual OniStatus SetVideoMode(OniVideoMode* pVideoMode);
 	    virtual OniStatus GetVideoMode(OniVideoMode* pVideoMode);
-	
+
 	    virtual OniStatus SetCropping(OniCropping* cropping);
 	    virtual OniStatus GetCropping(OniCropping* cropping);
-	
+
 	    bool isRunning() { return m_running; }
 
-	    virtual void frameReady(unsigned long timestamp) = 0;
-	
+	    virtual void frameReady(double timestamp) = 0;
+
     protected:
 	    Kinect2StreamImpl *m_pStreamImpl;
 	    OniVideoMode m_videoMode;

@@ -13,7 +13,7 @@ namespace kinect2_device
 	    ColorKinect2Stream(Kinect2StreamImpl* pStreamImpl);
       virtual ~ColorKinect2Stream();
 
-	    virtual void frameReady(unsigned long timestamp);
+	    virtual void frameReady(double timestamp);
 
     private:
       IColorFrameReader* m_frameReader;

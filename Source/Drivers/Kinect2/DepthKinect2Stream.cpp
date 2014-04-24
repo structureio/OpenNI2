@@ -40,7 +40,7 @@ DepthKinect2Stream::~DepthKinect2Stream()
   delete[] m_colorSpaceCoords;
 }
 
-void DepthKinect2Stream::frameReady(unsigned long timestamp)
+void DepthKinect2Stream::frameReady(double timestamp)
 {
   // Get Kinect2 frame
   if (!m_frameReader) {
@@ -86,7 +86,7 @@ void DepthKinect2Stream::frameReady(unsigned long timestamp)
 	pFrame->videoMode.fps = m_videoMode.fps;
 	pFrame->sensorType = ONI_SENSOR_DEPTH;
 	pFrame->frameIndex = m_frameIdx++;
-  pFrame->timestamp = timestamp;
+  pFrame->timestamp = static_cast<int>(timestamp);
 
 	int numPoints = m_videoMode.resolutionY * m_videoMode.resolutionX;
 	if (m_pStreamImpl->getImageRegistrationMode() == ONI_IMAGE_REGISTRATION_DEPTH_TO_COLOR) {

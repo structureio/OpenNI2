@@ -11,6 +11,7 @@ using namespace oni::driver;
 Kinect2Device::Kinect2Device(IKinectSensor* pKinectSensor)
   : m_pDepthStream(NULL),
     m_pColorStream(NULL),
+    m_pIRStream(NULL),
     m_pKinectSensor(pKinectSensor)
 {
 	m_numSensors = 3;
@@ -43,6 +44,12 @@ Kinect2Device::Kinect2Device(IKinectSensor* pKinectSensor)
 	m_sensors[2].pSupportedVideoModes[0].fps = DEFAULT_FPS;
 	m_sensors[2].pSupportedVideoModes[0].resolutionX = 512;
 	m_sensors[2].pSupportedVideoModes[0].resolutionY = 424;
+
+  LARGE_INTEGER qpc = {0};
+  if (QueryPerformanceCounter(&qpc))
+  {
+      m_perfCounter = qpc.QuadPart;
+  }
 }
 
 Kinect2Device::~Kinect2Device()
@@ -50,11 +57,15 @@ Kinect2Device::~Kinect2Device()
 	if (m_pDepthStream != NULL) {
 		XN_DELETE(m_pDepthStream);
   }
-	
+
   if (m_pColorStream!= NULL) {
 		XN_DELETE(m_pColorStream);
   }
-	
+
+  if (m_pIRStream!= NULL) {
+		XN_DELETE(m_pIRStream);
+  }
+
 	if (m_pKinectSensor) {
 		m_pKinectSensor->Close();
     m_pKinectSensor->Release();
@@ -71,30 +82,30 @@ OniStatus Kinect2Device::getSensorInfoList(OniSensorInfo** pSensors, int* numSen
 StreamBase* Kinect2Device::createStream(OniSensorType sensorType)
 {
 	BaseKinect2Stream* pImage = NULL;
-	
+
 	if (sensorType == ONI_SENSOR_COLOR)
 	{
 		if (m_pColorStream == NULL)
 		{
-			m_pColorStream = XN_NEW(Kinect2StreamImpl, m_pKinectSensor, sensorType);
-		}	
+			m_pColorStream = XN_NEW(Kinect2StreamImpl, m_pKinectSensor, sensorType, m_perfCounter);
+		}
 		pImage = XN_NEW(ColorKinect2Stream, m_pColorStream);
 	}
 	else if (sensorType == ONI_SENSOR_DEPTH)
 	{
 		if (m_pDepthStream == NULL)
 		{
-			m_pDepthStream = XN_NEW(Kinect2StreamImpl, m_pKinectSensor, sensorType);			
+			m_pDepthStream = XN_NEW(Kinect2StreamImpl, m_pKinectSensor, sensorType, m_perfCounter);
 		}
 		pImage = XN_NEW(DepthKinect2Stream, m_pDepthStream); 
 	}
-	if (sensorType ==  ONI_SENSOR_IR)
+	else if (sensorType ==  ONI_SENSOR_IR)
 	{
-		if (m_pColorStream == NULL)
+		if (m_pIRStream == NULL)
 		{
-			m_pColorStream = XN_NEW(Kinect2StreamImpl, m_pKinectSensor, sensorType);
-		}		
-		pImage = XN_NEW(IRKinect2Stream, m_pColorStream);
+			m_pIRStream = XN_NEW(Kinect2StreamImpl, m_pKinectSensor, sensorType, m_perfCounter);
+		}
+		pImage = XN_NEW(IRKinect2Stream, m_pIRStream);
 	}
 	return pImage;
 }

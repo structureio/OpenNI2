@@ -38,7 +38,7 @@ ColorKinect2Stream::~ColorKinect2Stream()
   delete[] m_buffer;
 }
 
-void ColorKinect2Stream::frameReady(unsigned long timestamp)
+void ColorKinect2Stream::frameReady(double timestamp)
 {
   // Get Kinect2 frame
   if (!m_frameReader) {
@@ -97,7 +97,7 @@ void ColorKinect2Stream::frameReady(unsigned long timestamp)
 	pFrame->videoMode.fps = m_videoMode.fps;
 	pFrame->sensorType = ONI_SENSOR_COLOR;
 	pFrame->frameIndex = m_frameIdx++;
-  pFrame->timestamp = timestamp;
+  pFrame->timestamp = static_cast<int>(timestamp);
 
 	OniRGB888Pixel* data_out = reinterpret_cast<OniRGB888Pixel*>(pFrame->data);
   const int xStride = 1920/m_videoMode.resolutionX;
