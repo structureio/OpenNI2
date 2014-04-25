@@ -28,7 +28,7 @@ namespace kinect2_device
 
 	    bool isRunning() { return m_running; }
 
-	    virtual void frameReady(double timestamp) = 0;
+	    virtual void frameReady(void* data, int width, int height, double timestamp) = 0;
 
     protected:
 	    Kinect2StreamImpl *m_pStreamImpl;

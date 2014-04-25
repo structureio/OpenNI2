@@ -12,7 +12,7 @@ namespace kinect2_device
 	    DepthKinect2Stream(Kinect2StreamImpl* pStreamImpl);
       virtual ~DepthKinect2Stream();
 
-	    virtual void frameReady(double timestamp);
+	    virtual void frameReady(void* data, int width, int height, double timestamp);
 
 	    virtual OniStatus getProperty(int propertyId, void* data, int* pDataSize);
 	    virtual OniBool isPropertySupported(int propertyId);
@@ -21,11 +21,10 @@ namespace kinect2_device
 	    virtual OniStatus SetVideoMode(OniVideoMode* pVideoMode);
 
     private:
-	    void copyDepthPixelsStraight(const USHORT* source, int numPoints, OniFrame* pFrame);
-	    void copyDepthPixelsWithImageRegistration(const USHORT* source, int numPoints, OniFrame* pFrame);
+	    void copyDepthPixelsStraight(const UINT16* data_in, int width, int height, OniFrame* pFrame);
+	    void copyDepthPixelsWithImageRegistration(const UINT16* data_in, int width, int height, OniFrame* pFrame);
 
     private:
-      IDepthFrameReader* m_frameReader;
       ColorSpacePoint* m_colorSpaceCoords;
   };
 } // namespace kinect2_device

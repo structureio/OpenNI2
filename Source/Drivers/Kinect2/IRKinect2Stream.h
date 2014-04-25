@@ -11,12 +11,7 @@ namespace kinect2_device
   {
     public:
 	    IRKinect2Stream(Kinect2StreamImpl* pStreamImpl);
-      virtual ~IRKinect2Stream();
-
-	    virtual void frameReady(double timestamp);
-
-    private:
-      IInfraredFrameReader* m_frameReader;
+	    virtual void frameReady(void* data, int width, int height, double timestamp);
   };
 } // namespace kinect2_device
 

@@ -1,7 +1,6 @@
 #include "ColorKinect2Stream.h"
 
 #include "Kinect2StreamImpl.h"
-#include <Kinect.h>
 
 using namespace oni::driver;
 using namespace kinect2_device;
@@ -14,65 +13,10 @@ ColorKinect2Stream::ColorKinect2Stream(Kinect2StreamImpl* pStreamImpl)
 	m_videoMode.fps         = DEFAULT_FPS;
 	m_videoMode.resolutionX = 960;
 	m_videoMode.resolutionY = 540;
-  m_frameReader = NULL;
-  m_buffer = new RGBQUAD[1920*1080];
-
-  IColorFrameSource* frameSource;
-  HRESULT hr = pStreamImpl->getKinectSensor()->get_ColorFrameSource(&frameSource);
-  if (FAILED(hr)) {
-    return;
-  }
-
-  hr = frameSource->OpenReader(&m_frameReader);
-  frameSource->Release();
-  if (FAILED(hr)) {
-    return;
-  }
 }
 
-ColorKinect2Stream::~ColorKinect2Stream()
+void ColorKinect2Stream::frameReady(void* data, int width, int height, double timestamp)
 {
-  if (m_frameReader) {
-    m_frameReader->Release();
-  }
-  delete[] m_buffer;
-}
-
-void ColorKinect2Stream::frameReady(double timestamp)
-{
-  // Get Kinect2 frame
-  if (!m_frameReader) {
-    return;
-  }
-
-  IColorFrame* frame;
-  HRESULT hr = m_frameReader->AcquireLatestFrame(&frame);
-  if (FAILED(hr)) {
-    return;
-  }
-
-  ColorImageFormat imageFormat = ColorImageFormat_None;
-  hr = frame->get_RawColorImageFormat(&imageFormat);
-  if (FAILED(hr)) {
-    return;
-  }
-
-  RGBQUAD* data_in;
-  if (imageFormat == ColorImageFormat_Bgra) {
-    UINT bufferSize;
-    hr = frame->AccessRawUnderlyingBuffer(&bufferSize, reinterpret_cast<BYTE**>(&data_in));
-  }
-  else {
-    hr = frame->CopyConvertedFrameDataToArray(1920*1080*sizeof(RGBQUAD), reinterpret_cast<BYTE*>(m_buffer), ColorImageFormat_Bgra);
-	  data_in = m_buffer;
-  }
-  if (FAILED(hr)) {
-    frame->Release();
-    return;
-  }
-  
-
-  // Create OniFrame
 	OniFrame* pFrame = getServices().acquireFrame();
 	pFrame->videoMode.resolutionX = m_videoMode.resolutionX;
 	pFrame->videoMode.resolutionY = m_videoMode.resolutionY;
@@ -99,16 +43,17 @@ void ColorKinect2Stream::frameReady(double timestamp)
 	pFrame->frameIndex = m_frameIdx++;
   pFrame->timestamp = static_cast<int>(timestamp);
 
+  RGBQUAD* data_in = reinterpret_cast<RGBQUAD*>(data);
 	OniRGB888Pixel* data_out = reinterpret_cast<OniRGB888Pixel*>(pFrame->data);
-  const int xStride = 1920/m_videoMode.resolutionX;
-  const int yStride = 1080/m_videoMode.resolutionY;
+  const int xStride = width/m_videoMode.resolutionX;
+  const int yStride = height/m_videoMode.resolutionY;
   const int frameX = pFrame->cropOriginX * xStride;
   const int frameY = pFrame->cropOriginY * yStride;
   const int frameWidth = pFrame->width * xStride;
   const int frameHeight = pFrame->height * yStride;
   for (int y = frameY; y < frameY + frameHeight; y += yStride) {
     for (int x = frameX; x < frameX + frameWidth; x += xStride) {
-      RGBQUAD* iter = data_in + (y*1920 + x);
+      RGBQUAD* iter = data_in + (y*width + x);
 			data_out->b = iter->rgbBlue;
 			data_out->r = iter->rgbRed;
 			data_out->g = iter->rgbGreen;
@@ -116,9 +61,6 @@ void ColorKinect2Stream::frameReady(double timestamp)
     }
   }
 
-
-  // Emit OniFrame and clean
-  frame->Release();
 	raiseNewFrame(pFrame);
 	getServices().releaseFrame(pFrame);
 }

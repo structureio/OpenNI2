@@ -7,6 +7,9 @@
 struct IKinectSensor;
 struct ICoordinateMapper;
 struct IFrameDescription;
+struct IColorFrameReader;
+struct IDepthFrameReader;
+struct IInfraredFrameReader;
 
 namespace kinect2_device
 {
@@ -43,12 +46,27 @@ namespace kinect2_device
     private:
 	    void setDefaultVideoMode();
       IFrameDescription* getFrameDescription(OniSensorType sensorType);
+      void createFrameBuffer();
+      void destroyFrameBuffer();
+      void openFrameReader();
+      void closeFrameReader();
+      void* populateFrameBuffer(int& buffWidth, int& buffHeight);
 
 	    static XN_THREAD_PROC threadFunc(XN_THREAD_PARAM pThreadParam);
 
     private:
 	    IKinectSensor* m_pKinectSensor;
       ICoordinateMapper* m_pCoordinateMapper;
+      union {
+        RGBQUAD* color;
+        UINT16* depth;
+        UINT16* infrared;
+      } m_pFrameBuffer;
+      union {
+        IColorFrameReader* color;
+        IDepthFrameReader* depth;
+        IInfraredFrameReader* infrared;
+      } m_pFrameReader;
 	    OniSensorType m_sensorType;
 	    OniImageRegistrationMode m_imageRegistrationMode;
 	    OniVideoMode m_videoMode;
@@ -56,8 +74,6 @@ namespace kinect2_device
 
 	    // Thread
 	    bool m_running;
-	    HANDLE m_hStreamHandle;
-	    HANDLE m_hNextFrameEvent;
       LONGLONG m_perfCounter;
       double m_perfFreq;
 	    XN_THREAD_HANDLE m_threadHandle;

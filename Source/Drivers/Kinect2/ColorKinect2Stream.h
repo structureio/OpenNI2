@@ -11,13 +11,7 @@ namespace kinect2_device
   {
     public:
 	    ColorKinect2Stream(Kinect2StreamImpl* pStreamImpl);
-      virtual ~ColorKinect2Stream();
-
-	    virtual void frameReady(double timestamp);
-
-    private:
-      IColorFrameReader* m_frameReader;
-      RGBQUAD* m_buffer;
+	    virtual void frameReady(void* data, int width, int height, double timestamp);
   };
 } // namespace kinect2_device
 

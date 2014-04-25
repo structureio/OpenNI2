@@ -1,7 +1,6 @@
 #include "IRKinect2Stream.h"
 
 #include "Kinect2StreamImpl.h"
-#include <Kinect.h>
 
 using namespace oni::driver;
 using namespace kinect2_device;
@@ -14,51 +13,10 @@ IRKinect2Stream::IRKinect2Stream(Kinect2StreamImpl* pStreamImpl)
 	m_videoMode.fps = DEFAULT_FPS;
 	m_videoMode.resolutionX = 512;
 	m_videoMode.resolutionY = 424;
-  m_frameReader = NULL;
-
-  IInfraredFrameSource* frameSource;
-  HRESULT hr = pStreamImpl->getKinectSensor()->get_InfraredFrameSource(&frameSource);
-  if (FAILED(hr)) {
-    return;
-  }
-
-  hr = frameSource->OpenReader(&m_frameReader);
-  frameSource->Release();
-  if (FAILED(hr)) {
-    return;
-  }
 }
 
-IRKinect2Stream::~IRKinect2Stream()
+void IRKinect2Stream::frameReady(void* data, int width, int height, double timestamp)
 {
-  if (m_frameReader) {
-    m_frameReader->Release();
-  }
-}
-
-void IRKinect2Stream::frameReady(double timestamp)
-{
-  // Get Kinect2 frame
-  if (!m_frameReader) {
-    return;
-  }
-
-  IInfraredFrame* frame;
-  HRESULT hr = m_frameReader->AcquireLatestFrame(&frame);
-  if (FAILED(hr)) {
-    return;
-  }
-
-	unsigned short* data_in;
-  unsigned int data_in_size;
-  hr = frame->AccessUnderlyingBuffer(&data_in_size, &data_in);
-  if (FAILED(hr)) {
-    frame->Release();
-    return;
-  }
-
-
-  // Create OniFrame
 	OniFrame* pFrame = getServices().acquireFrame();
 	pFrame->videoMode.resolutionX = m_videoMode.resolutionX;
 	pFrame->videoMode.resolutionY = m_videoMode.resolutionY;
@@ -85,29 +43,22 @@ void IRKinect2Stream::frameReady(double timestamp)
 	pFrame->frameIndex = m_frameIdx++;
   pFrame->timestamp = static_cast<int>(timestamp);
 
+  unsigned short* data_in = reinterpret_cast<unsigned short*>(data);
 	unsigned short* data_out = reinterpret_cast<unsigned short*>(pFrame->data);
-	if (!m_cropping.enabled)
-	{
-    xnOSMemCopy(data_out, data_in, pFrame->dataSize);
-	}
-	else
-	{
-		int cropY = m_cropping.originY;
-		while (cropY < m_cropping.originY + m_cropping.height)
-		{
-			int cropX = m_cropping.originX;
-			while (cropX < m_cropping.originX + m_cropping.width)
-			{
-				unsigned short *iter = data_in + (cropY * m_videoMode.resolutionX + cropX++);
-				*(data_out++) = (*iter);
-			}
-			cropY++;
-		}
-	}
+  const int xStride = width/m_videoMode.resolutionX;
+  const int yStride = height/m_videoMode.resolutionY;
+  const int frameX = pFrame->cropOriginX * xStride;
+  const int frameY = pFrame->cropOriginY * yStride;
+  const int frameWidth = pFrame->width * xStride;
+  const int frameHeight = pFrame->height * yStride;
+  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+      unsigned short* iter = data_in + (y*width + x);
+      *data_out = *iter;
+			data_out++;
+    }
+  }
 
-
-  // Emit OniFrame and clean
-  frame->Release();
 	raiseNewFrame(pFrame);
 	getServices().releaseFrame(pFrame);
 }

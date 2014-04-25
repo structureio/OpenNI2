@@ -26,12 +26,16 @@ OniStatus Kinect2Driver::initialize(DeviceConnectedCallback connectedCallback,
   // Get sensor instance
   IKinectSensor* pKinectSensor = NULL;
   hr = ::GetDefaultKinectSensor(&pKinectSensor);
-  if (FAILED(hr) || !pKinectSensor) {
+  if (FAILED(hr)) {
+    if (pKinectSensor) {
+      pKinectSensor->Release();
+    }
     return ONI_STATUS_NO_DEVICE;
   }
 
   hr = pKinectSensor->Open();
   if (FAILED(hr)) {
+    pKinectSensor->Release();
     return ONI_STATUS_ERROR;
   }
 
@@ -82,7 +86,10 @@ DeviceBase* Kinect2Driver::deviceOpen(const char* uri, const char* /*mode*/)
         IKinectSensor* pKinectSensor = NULL;
 				HRESULT hr;
         hr = ::GetDefaultKinectSensor(&pKinectSensor);
-        if (FAILED(hr) || !pKinectSensor) {
+        if (FAILED(hr)) {
+          if (pKinectSensor) {
+            pKinectSensor->Release();
+          }
           return NULL;
         }
 
@@ -95,18 +102,21 @@ DeviceBase* Kinect2Driver::deviceOpen(const char* uri, const char* /*mode*/)
 	      size_t origsize = wcslen(sensorId) + 1;
 	      wcstombs_s(&convertedChars, sensorUri, origsize, sensorId, _TRUNCATE);
         if (xnOSStrCmp(iter->Key()->uri, sensorUri) != 0) {
+          pKinectSensor->Release();
           return NULL;
         }
-        
+
         // Initialize the Kinect2
         hr = pKinectSensor->Open();
         Kinect2Device* pDevice = XN_NEW(Kinect2Device, pKinectSensor);
         if (!pDevice) {
+          pKinectSensor->Close();
+          pKinectSensor->Release();
           return NULL;
         }
 				iter->Value() = pDevice;
 				return pDevice;
-			}			
+			}
 		}
 	}
 	return NULL;	

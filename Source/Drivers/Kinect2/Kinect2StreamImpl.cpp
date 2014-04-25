@@ -15,8 +15,6 @@ Kinect2StreamImpl::Kinect2StreamImpl(IKinectSensor *pKinectSensor, OniSensorType
     m_sensorType(sensorType),
     m_imageRegistrationMode(ONI_IMAGE_REGISTRATION_OFF),
     m_running(FALSE),
-    m_hStreamHandle(INVALID_HANDLE_VALUE),
-    m_hNextFrameEvent(CreateEvent(NULL, TRUE, FALSE, NULL)),
     m_perfCounter(basePerfCounter),
     m_perfFreq(1.0)
 {
@@ -24,7 +22,17 @@ Kinect2StreamImpl::Kinect2StreamImpl(IKinectSensor *pKinectSensor, OniSensorType
   if (FAILED(hr)) {
     m_pCoordinateMapper = NULL;
   }
-  
+
+  m_pFrameBuffer.color = NULL;
+  m_pFrameBuffer.depth = NULL;
+  m_pFrameBuffer.infrared = NULL;
+  createFrameBuffer();
+
+  m_pFrameReader.color = NULL;
+  m_pFrameReader.depth = NULL;
+  m_pFrameReader.infrared = NULL;
+  openFrameReader();
+
   LARGE_INTEGER qpf = {0};
   if (QueryPerformanceFrequency(&qpf))
   {
@@ -42,9 +50,8 @@ Kinect2StreamImpl::~Kinect2StreamImpl()
 		xnOSCloseThread(&m_threadHandle);
 	}
 
-	if (m_hNextFrameEvent != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_hNextFrameEvent);
-  }
+  closeFrameReader();
+  destroyFrameBuffer();
 
   if (m_pCoordinateMapper) {
     m_pCoordinateMapper->Release();
@@ -105,32 +112,38 @@ void Kinect2StreamImpl::stop()
 }
 
 void Kinect2StreamImpl::setSensorType(OniSensorType sensorType)
-{ 
-	if( m_sensorType != sensorType) {
-		m_sensorType = sensorType; 
+{
+	if (m_sensorType != sensorType) {
+    closeFrameReader();
+    destroyFrameBuffer();
+
+		m_sensorType = sensorType;
+
+    createFrameBuffer();
+    openFrameReader();
+
 		setDefaultVideoMode();
-	}	
+	}
 }
 
-static const unsigned int LOOP_TIMEOUT = 10;
 void Kinect2StreamImpl::mainLoop()
 {
 	m_running = TRUE;
 	while (m_running) {
-		//if ( WAIT_OBJECT_0 == WaitForSingleObject(m_hNextFrameEvent, LOOP_TIMEOUT) && m_running) {
-      LARGE_INTEGER qpc = {0};
-      QueryPerformanceCounter(&qpc);
-      double timestamp = static_cast<double>(qpc.QuadPart - m_perfCounter)/m_perfFreq;
+    int width, height;
+    void* data = populateFrameBuffer(width, height);
 
-			List<BaseKinect2Stream*>::ConstIterator iter = m_streamList.Begin();
-			while( iter != m_streamList.End()) {
-				if (((BaseKinect2Stream*)(*iter))->isRunning()) {
-          ((BaseKinect2Stream*)(*iter))->frameReady(timestamp);
-        }
-				++iter;
-			}
-      //Sleep(30);
-		//}
+    LARGE_INTEGER qpc = {0};
+    QueryPerformanceCounter(&qpc);
+    double timestamp = static_cast<double>(qpc.QuadPart - m_perfCounter)/m_perfFreq;
+
+		List<BaseKinect2Stream*>::ConstIterator iter = m_streamList.Begin();
+		while( iter != m_streamList.End()) {
+			if (((BaseKinect2Stream*)(*iter))->isRunning()) {
+        ((BaseKinect2Stream*)(*iter))->frameReady(data, width, height, timestamp);
+      }
+			++iter;
+		}
 	}
 	return;
 }
@@ -191,21 +204,18 @@ void Kinect2StreamImpl::setDefaultVideoMode()
 		m_videoMode.resolutionX = 960;
 		m_videoMode.resolutionY = 540;
 		break;
-
 	case ONI_SENSOR_DEPTH:
 		m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_DEPTH_1_MM;
 		m_videoMode.fps         = DEFAULT_FPS;
 		m_videoMode.resolutionX = 512;
 		m_videoMode.resolutionY = 424;
 		break;
-
 	case ONI_SENSOR_IR:
 		m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_GRAY16;
 		m_videoMode.fps         = DEFAULT_FPS;
 		m_videoMode.resolutionX = 512;
 		m_videoMode.resolutionY = 424;
 		break;
-
 	default:
 		break;
 	}
@@ -217,47 +227,224 @@ IFrameDescription* Kinect2StreamImpl::getFrameDescription(OniSensorType sensorTy
     return NULL;
   }
   
-  HRESULT hr;
-  IFrameDescription* frameDescription;
-
+  IFrameDescription* frameDescription = NULL;
   if (sensorType == ONI_SENSOR_COLOR) {
-    IColorFrameSource* frameSource;
-    hr = m_pKinectSensor->get_ColorFrameSource(&frameSource);
-    if (FAILED(hr)) {
-      return NULL;
+    IColorFrameSource* frameSource = NULL;
+    HRESULT hr = m_pKinectSensor->get_ColorFrameSource(&frameSource);
+    if (SUCCEEDED(hr)) {
+      hr = frameSource->get_FrameDescription(&frameDescription);
+      if (FAILED(hr) && frameDescription) {
+        frameDescription->Release();
+        frameDescription = NULL;
+      }
     }
-    hr = frameSource->get_FrameDescription(&frameDescription);
-    frameSource->Release();
-    if (FAILED(hr)) {
-      return NULL;
+    if (frameSource) {
+      frameSource->Release();
     }
   }
-  else if (sensorType = ONI_SENSOR_DEPTH) {
-    IDepthFrameSource* frameSource;
-    hr = m_pKinectSensor->get_DepthFrameSource(&frameSource);
-    if (FAILED(hr)) {
-      return NULL;
+  else if (sensorType == ONI_SENSOR_DEPTH) {
+    IDepthFrameSource* frameSource = NULL;
+    HRESULT hr = m_pKinectSensor->get_DepthFrameSource(&frameSource);
+    if (SUCCEEDED(hr)) {
+      hr = frameSource->get_FrameDescription(&frameDescription);
+      if (FAILED(hr) && frameDescription) {
+        frameDescription->Release();
+        frameDescription = NULL;
+      }
     }
-    hr = frameSource->get_FrameDescription(&frameDescription);
-    frameSource->Release();
-    if (FAILED(hr)) {
-      return NULL;
+    if (frameSource) {
+      frameSource->Release();
     }
   }
   else { // ONI_SENSOR_IR
-    IInfraredFrameSource* frameSource;
-    hr = m_pKinectSensor->get_InfraredFrameSource(&frameSource);
-    if (FAILED(hr)) {
-      return NULL;
+    IInfraredFrameSource* frameSource = NULL;
+    HRESULT hr = m_pKinectSensor->get_InfraredFrameSource(&frameSource);
+    if (SUCCEEDED(hr)) {
+      hr = frameSource->get_FrameDescription(&frameDescription);
+      if (FAILED(hr) && frameDescription) {
+        frameDescription->Release();
+        frameDescription = NULL;
+      }
     }
-    hr = frameSource->get_FrameDescription(&frameDescription);
-    frameSource->Release();
-    if (FAILED(hr)) {
-      return NULL;
+    if (frameSource) {
+      frameSource->Release();
     }
   }
 
   return frameDescription;
+}
+
+void Kinect2StreamImpl::createFrameBuffer()
+{
+  if (m_sensorType == ONI_SENSOR_COLOR && !m_pFrameBuffer.color) {
+    m_pFrameBuffer.color = new RGBQUAD[1920*1080];
+  }
+  else if (m_sensorType == ONI_SENSOR_DEPTH && !m_pFrameBuffer.depth) {
+    m_pFrameBuffer.depth = new UINT16[512*424];
+  }
+  else if (!m_pFrameBuffer.infrared) { // ONI_SENSOR_IR
+    m_pFrameBuffer.infrared = new UINT16[512*424];
+  }
+}
+
+void Kinect2StreamImpl::destroyFrameBuffer()
+{
+  if (m_sensorType == ONI_SENSOR_COLOR && m_pFrameBuffer.color) {
+    delete[] m_pFrameBuffer.color;
+    m_pFrameBuffer.color = NULL;
+  }
+  else if (m_sensorType == ONI_SENSOR_DEPTH && m_pFrameBuffer.depth) {
+    delete[] m_pFrameBuffer.depth;
+    m_pFrameBuffer.depth = NULL;
+  }
+  else if (m_pFrameBuffer.infrared) { // ONI_SENSOR_IR
+    delete[] m_pFrameBuffer.infrared;
+    m_pFrameBuffer.infrared = NULL;
+  }
+}
+
+void Kinect2StreamImpl::openFrameReader()
+{
+  if (!m_pKinectSensor) {
+    return;
+  }
+
+  if (m_sensorType == ONI_SENSOR_COLOR && !m_pFrameReader.color) {
+    IColorFrameSource* frameSource = NULL;
+    HRESULT hr = m_pKinectSensor->get_ColorFrameSource(&frameSource);
+    if (SUCCEEDED(hr)) {
+      hr = frameSource->OpenReader(&m_pFrameReader.color);
+      if (FAILED(hr) && m_pFrameReader.color) {
+        m_pFrameReader.color->Release();
+        m_pFrameReader.color = NULL;
+      }
+    }
+    if (frameSource) {
+      frameSource->Release();
+    }
+  }
+  else if (m_sensorType == ONI_SENSOR_DEPTH && !m_pFrameReader.depth) {
+    IDepthFrameSource* frameSource = NULL;
+    HRESULT hr = m_pKinectSensor->get_DepthFrameSource(&frameSource);
+    if (SUCCEEDED(hr)) {
+      hr = frameSource->OpenReader(&m_pFrameReader.depth);
+      if (FAILED(hr) && m_pFrameReader.depth) {
+        m_pFrameReader.depth->Release();
+        m_pFrameReader.depth = NULL;
+      }
+    }
+    if (frameSource) {
+      frameSource->Release();
+    }
+  }
+  else if(!m_pFrameReader.infrared) { // ONI_SENSOR_IR
+    IInfraredFrameSource* frameSource = NULL;
+    HRESULT hr = m_pKinectSensor->get_InfraredFrameSource(&frameSource);
+    if (SUCCEEDED(hr)) {
+      hr = frameSource->OpenReader(&m_pFrameReader.infrared);
+      if (FAILED(hr) && m_pFrameReader.infrared) {
+        m_pFrameReader.infrared->Release();
+        m_pFrameReader.infrared = NULL;
+      }
+    }
+    if (frameSource) {
+      frameSource->Release();
+    }
+  }
+}
+
+void Kinect2StreamImpl::closeFrameReader()
+{
+  if (m_sensorType == ONI_SENSOR_COLOR && m_pFrameReader.color) {
+    m_pFrameReader.color->Release();
+    m_pFrameReader.color = NULL;
+  }
+  else if (m_sensorType == ONI_SENSOR_DEPTH && m_pFrameReader.depth) {
+    m_pFrameReader.depth->Release();
+    m_pFrameReader.depth = NULL;
+  }
+  else if (m_pFrameReader.infrared) { // ONI_SENSOR_IR
+    m_pFrameReader.infrared->Release();
+    m_pFrameReader.infrared = NULL;
+  }
+}
+
+void* Kinect2StreamImpl::populateFrameBuffer(int& buffWidth, int& buffHeight)
+{
+  buffWidth = 0;
+  buffHeight = 0;
+
+  if (m_sensorType == ONI_SENSOR_COLOR) {
+    if (m_pFrameReader.color && m_pFrameBuffer.color) {
+      buffWidth = 1920;
+      buffHeight = 1080;
+
+      IColorFrame* frame = NULL;
+      HRESULT hr = m_pFrameReader.color->AcquireLatestFrame(&frame);
+      if (SUCCEEDED(hr)) {
+        ColorImageFormat imageFormat = ColorImageFormat_None;
+        hr = frame->get_RawColorImageFormat(&imageFormat);
+        if (SUCCEEDED(hr)) {
+          if (imageFormat == ColorImageFormat_Bgra) {
+            RGBQUAD* data;
+            UINT bufferSize;
+            frame->AccessRawUnderlyingBuffer(&bufferSize, reinterpret_cast<BYTE**>(&data));
+            memcpy(m_pFrameBuffer.color, data, 1920*1080*sizeof(RGBQUAD));
+          }
+          else {
+            frame->CopyConvertedFrameDataToArray(1920*1080*sizeof(RGBQUAD), reinterpret_cast<BYTE*>(m_pFrameBuffer.color), ColorImageFormat_Bgra);
+          }
+        }
+      }
+      if (frame) {
+        frame->Release();
+      }
+
+      return reinterpret_cast<void*>(m_pFrameBuffer.color);
+    }
+  }
+  else if (m_sensorType == ONI_SENSOR_DEPTH) {
+    if (m_pFrameReader.depth && m_pFrameBuffer.depth) {
+      buffWidth = 512;
+      buffHeight = 424;
+
+      IDepthFrame* frame = NULL;
+      HRESULT hr = m_pFrameReader.depth->AcquireLatestFrame(&frame);
+      if (SUCCEEDED(hr)) {
+        UINT16* data;
+        UINT bufferSize;
+        frame->AccessUnderlyingBuffer(&bufferSize, &data);
+        memcpy(m_pFrameBuffer.depth, data, 512*424*sizeof(UINT16));
+      }
+      if (frame) {
+        frame->Release();
+      }
+
+      return reinterpret_cast<void*>(m_pFrameBuffer.depth);
+    }
+  }
+  else { // ONI_SENSOR_IR
+    if (m_pFrameReader.infrared && m_pFrameBuffer.infrared) {
+      buffWidth = 512;
+      buffHeight = 424;
+
+      IInfraredFrame* frame = NULL;
+      HRESULT hr = m_pFrameReader.infrared->AcquireLatestFrame(&frame);
+      if (SUCCEEDED(hr)) {
+        UINT16* data;
+        UINT bufferSize;
+        frame->AccessUnderlyingBuffer(&bufferSize, &data);
+        memcpy(m_pFrameBuffer.infrared, data, 512*424*sizeof(UINT16));
+      }
+      if (frame) {
+        frame->Release();
+      }
+
+      return reinterpret_cast<void*>(m_pFrameBuffer.infrared);
+    }
+  }
+
+  return NULL;
 }
 
 XN_THREAD_PROC Kinect2StreamImpl::threadFunc(XN_THREAD_PARAM pThreadParam)
