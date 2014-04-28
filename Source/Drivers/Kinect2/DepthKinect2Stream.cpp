@@ -17,11 +17,13 @@ DepthKinect2Stream::DepthKinect2Stream(Kinect2StreamImpl* pStreamImpl)
 	m_videoMode.resolutionX = 512;
 	m_videoMode.resolutionY = 424;
   m_colorSpaceCoords = new ColorSpacePoint[512*424];
+  m_registeredDepthMap = new UINT16[512*424];
 }
 
 DepthKinect2Stream::~DepthKinect2Stream()
 {
   delete[] m_colorSpaceCoords;
+  delete[] m_registeredDepthMap;
 }
 
 void DepthKinect2Stream::frameReady(void* data, int width, int height, double timestamp)
@@ -114,16 +116,6 @@ void DepthKinect2Stream::notifyAllProperties()
 	BaseKinect2Stream::notifyAllProperties();
 }
 
-OniStatus DepthKinect2Stream::SetVideoMode(OniVideoMode* videoMode)
-{
-	if (!m_pStreamImpl->isRunning())
-	{
-    delete[] m_colorSpaceCoords;
-    m_colorSpaceCoords = new ColorSpacePoint[videoMode->resolutionX * videoMode->resolutionY];
-	}
-	return BaseKinect2Stream::SetVideoMode(videoMode);
-}
-
 void DepthKinect2Stream::copyDepthPixelsStraight(const UINT16* data_in, int width, int height, OniFrame* pFrame)
 {
   // Copy the depth pixels to OniDriverFrame
@@ -153,50 +145,67 @@ void DepthKinect2Stream::copyDepthPixelsWithImageRegistration(const UINT16* data
 
   const int xStride = width/m_videoMode.resolutionX;
   const int yStride = height/m_videoMode.resolutionY;
-	const int minX = pFrame->cropOriginX;
-	const int minY = pFrame->cropOriginY;
-  const int sizeX = pFrame->width;
-  const int sizeY = pFrame->height;
   const int frameX = pFrame->cropOriginX * xStride;
   const int frameY = pFrame->cropOriginY * yStride;
   const int frameWidth = pFrame->width * xStride;
   const int frameHeight = pFrame->height * yStride;
-  const int numPoints = m_videoMode.resolutionX * m_videoMode.resolutionY;
-  const float xFactor = static_cast<float>(m_videoMode.resolutionX)/1920.0f;
-  const float yFactor = static_cast<float>(m_videoMode.resolutionY)/1080.0f;
-  const int skipWidth = m_videoMode.resolutionX - sizeX;
+  const float xFactor = static_cast<float>(width)/1920.0f;
+  const float yFactor = static_cast<float>(height)/1080.0f;
 
   ICoordinateMapper* coordinateMapper = m_pStreamImpl->getCoordinateMapper();
   if (coordinateMapper == NULL) {
     return;
   }
 
-  HRESULT hr = coordinateMapper->MapDepthFrameToColorSpace(width*height, data_in, numPoints, m_colorSpaceCoords);
+  HRESULT hr = coordinateMapper->MapDepthFrameToColorSpace(width*height, data_in, width*height, m_colorSpaceCoords);
   if (FAILED(hr)) {
     return;
   }
-  
-	unsigned short* data_out = (unsigned short*) pFrame->data;
-	xnOSMemSet(data_out, 0, pFrame->dataSize);
+
+	unsigned short* data_out = (unsigned short*) m_registeredDepthMap;
+	xnOSMemSet(data_out, 0, width*height*2);
 
 	const ColorSpacePoint* mappedCoordsIter = m_colorSpaceCoords;
-  mappedCoordsIter += minX + minY*m_videoMode.resolutionX;
-
-  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
-    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
       const float fX = mappedCoordsIter->X*xFactor;
       const float fY = mappedCoordsIter->Y*yFactor;
-		  const int cx = static_cast<int>(fX + 0.5f) - minX;
-		  const int cy = static_cast<int>(fY + 0.5f) - minY;
-
-		  if (cx >= 0 && cy >= 0 && cx < sizeX && cy < sizeY) {
+		  const int cx = static_cast<int>(fX + 0.5f);
+		  const int cy = static_cast<int>(fY + 0.5f);
+		  if (cx >= 0 && cy >= 0 && cx < width && cy < height) {
         unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
 			  const unsigned short d = FILTER_RELIABLE_DEPTH_VALUE(*iter);
-			  unsigned short* const p = data_out + cx + cy * sizeX;
+			  unsigned short* const p = data_out + cx + cy * width;
 			  if (*p == 0 || *p > d) *p = d;
 		  }
       mappedCoordsIter++;
     }
-		mappedCoordsIter += skipWidth;
+  }
+
+  // Fill vertical gaps caused by the difference in the aspect ratio between depth and color resolutions
+	data_out = (unsigned short*) pFrame->data;
+  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+      unsigned short* iter = const_cast<unsigned short*>(m_registeredDepthMap + (y*width + x));
+      if (*iter == 0) {
+        unsigned short davg = 0;
+        int dw = 0;
+        for (int ky = max(y - 1, 0); ky <= y + 1 && ky < height; ky++) {
+          unsigned short* kiter = const_cast<unsigned short*>(m_registeredDepthMap + (ky*width + x));
+          if (*kiter != 0) {
+            davg += *kiter;
+            dw += abs(ky - y);
+          }
+        }
+        *data_out = davg;
+        if (dw) {
+          *data_out /= dw;
+        }
+      }
+      else {
+        *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+      }
+			data_out++;
+    }
   }
 }

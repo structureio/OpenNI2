@@ -18,14 +18,13 @@ namespace kinect2_device
 	    virtual OniBool isPropertySupported(int propertyId);
 	    virtual void notifyAllProperties();
 
-	    virtual OniStatus SetVideoMode(OniVideoMode* pVideoMode);
-
     private:
 	    void copyDepthPixelsStraight(const UINT16* data_in, int width, int height, OniFrame* pFrame);
 	    void copyDepthPixelsWithImageRegistration(const UINT16* data_in, int width, int height, OniFrame* pFrame);
 
     private:
       ColorSpacePoint* m_colorSpaceCoords;
+      UINT16* m_registeredDepthMap;
   };
 } // namespace kinect2_device
 
