@@ -22,7 +22,6 @@
 #include "KinectDevice.h"
 #include <Shlobj.h>
 #include "NuiApi.h"
-#include <atlstr.h>
 #include "XnLog.h"
 
 using namespace oni::driver;
