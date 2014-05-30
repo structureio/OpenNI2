@@ -238,7 +238,8 @@ void XnStreamJPEGOutputMessage(j_common_ptr cinfo)
 XnStatus XnStreamInitCompressImageJ(XnStreamCompJPEGContext** ppStreamCompJPEGContext)
 {
 	// Validate the input/output pointers (to make sure none of them is NULL)
- 	XN_VALIDATE_OUTPUT_PTR(*ppStreamCompJPEGContext);
+ 	//XN_VALIDATE_OUTPUT_PTR(*ppStreamCompJPEGContext);
+
 	XnStreamCompJPEGContext* pStreamCompJPEGContext = NULL;
 	pStreamCompJPEGContext = XN_NEW(XnStreamCompJPEGContext);
 
@@ -263,7 +264,7 @@ XnStatus XnStreamInitCompressImageJ(XnStreamCompJPEGContext** ppStreamCompJPEGCo
 XnStatus XnStreamInitUncompressImageJ(XnStreamUncompJPEGContext** ppStreamUncompJPEGContext)
 {
 	// Validate the input/output pointers (to make sure none of them is NULL)
-	XN_VALIDATE_OUTPUT_PTR(*ppStreamUncompJPEGContext);
+	//XN_VALIDATE_OUTPUT_PTR(*ppStreamUncompJPEGContext);
 
 	XnStreamUncompJPEGContext* pStreamUncompJPEGContext = NULL;
 	pStreamUncompJPEGContext = XN_NEW(XnStreamUncompJPEGContext);
