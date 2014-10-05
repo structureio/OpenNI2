@@ -556,12 +556,6 @@ void PlayerDevice::MainLoop()
 			// Seek the frame ID for first source (seek to (frame ID-1) so next read frame is frameId).
 			PlayerSource* pSource = m_seek.pStream->GetSource();
 			XnStatus xnrc = m_player.SeekToFrame(pSource->GetNodeName(), m_seek.frameId, XN_PLAYER_SEEK_SET);
-			if (xnrc != XN_STATUS_OK)
-			{
-				// Failure to seek.
-				m_isSeeking = FALSE;
-				continue;
-			}
 
 			// Return playback speed to normal.
 			m_dPlaybackSpeed = playbackSpeed;
@@ -573,11 +567,11 @@ void PlayerDevice::MainLoop()
 			// Reset the time reference.
 			m_bHasTimeReference = FALSE;
 
-			// Raise the seek complete event.
-			m_SeekCompleteInternalEvent.Set();
-
 			// Mark the seeking flag as false.
 			m_isSeeking = FALSE;
+			
+			// Raise the seek complete event.
+			m_SeekCompleteInternalEvent.Set();
 		}
 		else
 		{
