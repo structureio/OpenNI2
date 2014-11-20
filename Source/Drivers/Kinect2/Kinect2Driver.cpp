@@ -6,7 +6,7 @@ using namespace oni::driver;
 using namespace kinect2_device;
 
 static const char VENDOR_VAL[] = "Microsoft";
-static const char NAME_VAL[] = "Kinect V2 Developer Preview";
+static const char NAME_VAL[] = "Kinect v2";
 
 Kinect2Driver::Kinect2Driver(OniDriverServices* pDriverServices)
   : DriverBase(pDriverServices)
@@ -38,6 +38,9 @@ OniStatus Kinect2Driver::initialize(DeviceConnectedCallback connectedCallback,
     pKinectSensor->Release();
     return ONI_STATUS_ERROR;
   }
+
+  // Wait some time to let the sensor initialize
+  Sleep(500);
 
   BOOLEAN available;
   hr = pKinectSensor->get_IsAvailable(&available);
