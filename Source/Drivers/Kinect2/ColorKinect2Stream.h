@@ -10,8 +10,8 @@ namespace kinect2_device
   class ColorKinect2Stream : public BaseKinect2Stream
   {
     public:
-	    ColorKinect2Stream(Kinect2StreamImpl* pStreamImpl);
-	    virtual void frameReady(void* data, int width, int height, double timestamp);
+      ColorKinect2Stream(Kinect2StreamImpl* pStreamImpl);
+      virtual void frameReady(void* data, int width, int height, double timestamp);
   };
 } // namespace kinect2_device
 

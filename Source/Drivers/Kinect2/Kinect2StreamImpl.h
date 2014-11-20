@@ -16,35 +16,35 @@ namespace kinect2_device
   class Kinect2StreamImpl
   {
     public:
-	    Kinect2StreamImpl(IKinectSensor * pKinectSensor, OniSensorType sensorType, LONGLONG basePerfCounter);
-	    virtual ~Kinect2StreamImpl();
+      Kinect2StreamImpl(IKinectSensor * pKinectSensor, OniSensorType sensorType, LONGLONG basePerfCounter);
+      virtual ~Kinect2StreamImpl();
 
-	    void addStream(BaseKinect2Stream* stream);
-	    void removeStream(BaseKinect2Stream* stream);
-	    unsigned int getStreamCount();
+      void addStream(BaseKinect2Stream* stream);
+      void removeStream(BaseKinect2Stream* stream);
+      unsigned int getStreamCount();
 
-	    void setVideoMode(OniVideoMode* videoMode);
+      void setVideoMode(OniVideoMode* videoMode);
 
-	    OniStatus virtual start();
-	    void virtual stop();
-	    bool	isRunning() { return m_running; }
+      OniStatus virtual start();
+      void virtual stop();
+      bool  isRunning() { return m_running; }
 
-	    OniSensorType getSensorType () { return m_sensorType; }
-	    void setSensorType(OniSensorType sensorType);
+      OniSensorType getSensorType () { return m_sensorType; }
+      void setSensorType(OniSensorType sensorType);
 
-	    void mainLoop();
+      void mainLoop();
 
       XnDouble getHorizontalFov();
       XnDouble getVerticalFov();
 
-	    OniImageRegistrationMode getImageRegistrationMode() const { return m_imageRegistrationMode; }
-	    void setImageRegistrationMode(OniImageRegistrationMode mode) { m_imageRegistrationMode = mode; }
+      OniImageRegistrationMode getImageRegistrationMode() const { return m_imageRegistrationMode; }
+      void setImageRegistrationMode(OniImageRegistrationMode mode) { m_imageRegistrationMode = mode; }
 
-	    IKinectSensor* getKinectSensor() { return m_pKinectSensor; } // Need review: not sure if it is a good idea to expose this.
-	    ICoordinateMapper* getCoordinateMapper() { return m_pCoordinateMapper; }
+      IKinectSensor* getKinectSensor() { return m_pKinectSensor; } // Need review: not sure if it is a good idea to expose this.
+      ICoordinateMapper* getCoordinateMapper() { return m_pCoordinateMapper; }
 
     private:
-	    void setDefaultVideoMode();
+      void setDefaultVideoMode();
       IFrameDescription* getFrameDescription(OniSensorType sensorType);
       void createFrameBuffer();
       void destroyFrameBuffer();
@@ -52,10 +52,10 @@ namespace kinect2_device
       void closeFrameReader();
       void* populateFrameBuffer(int& buffWidth, int& buffHeight);
 
-	    static XN_THREAD_PROC threadFunc(XN_THREAD_PARAM pThreadParam);
+      static XN_THREAD_PROC threadFunc(XN_THREAD_PARAM pThreadParam);
 
     private:
-	    IKinectSensor* m_pKinectSensor;
+      IKinectSensor* m_pKinectSensor;
       ICoordinateMapper* m_pCoordinateMapper;
       union {
         RGBQUAD* color;
@@ -67,16 +67,16 @@ namespace kinect2_device
         IDepthFrameReader* depth;
         IInfraredFrameReader* infrared;
       } m_pFrameReader;
-	    OniSensorType m_sensorType;
-	    OniImageRegistrationMode m_imageRegistrationMode;
-	    OniVideoMode m_videoMode;
-	    xnl::List<BaseKinect2Stream*> m_streamList;
+      OniSensorType m_sensorType;
+      OniImageRegistrationMode m_imageRegistrationMode;
+      OniVideoMode m_videoMode;
+      xnl::List<BaseKinect2Stream*> m_streamList;
 
-	    // Thread
-	    bool m_running;
+      // Thread
+      bool m_running;
       LONGLONG m_perfCounter;
       double m_perfFreq;
-	    XN_THREAD_HANDLE m_threadHandle;
+      XN_THREAD_HANDLE m_threadHandle;
   };
 } // namespace kinect2_device
 
