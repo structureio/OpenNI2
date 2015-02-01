@@ -19,7 +19,6 @@ namespace LF2 {
       m_f2dev = f2dev;
       m_driver = driver;
       // this is actually 3. but now color and ir are not supprted yet.
-      m_numSensors = 1;
 
       m_sensors[0].sensorType = ONI_SENSOR_DEPTH;
       m_sensors[0].numSupportedVideoModes = 1;
@@ -66,8 +65,8 @@ namespace LF2 {
     void
     destroyStream (oni::driver::StreamBase*);
   protected:
-    int m_numSensors;
-    OniSensorInfo * m_sensors;
+    static const int m_numSensors = 3;
+    OniSensorInfo m_sensors[m_numSensors];
     libfreenect2::Freenect2Device* m_f2dev;
     LF2Driver* m_driver;
   };
