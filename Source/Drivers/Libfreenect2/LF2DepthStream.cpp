@@ -6,7 +6,9 @@ int
 LF2DepthStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
 {
   frame_out->dataSize = frame_in->width * frame_in->height * frame_in->bytes_per_pixel;
-  frame_out->data = frame_in->data;
+
+  memcpy (frame_out->data,frame_in->data,frame_out->dataSize);
+
   frame_out->frameIndex = frame_in->sequence;
   frame_out->sensorType = ONI_SENSOR_DEPTH;
 
