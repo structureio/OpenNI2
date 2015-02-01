@@ -1,4 +1,6 @@
 #include "LF2DepthStream.h"
+#include <XnOS.h>
+
 
 using namespace LF2;
 
@@ -7,7 +9,8 @@ LF2DepthStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
 {
   frame_out->dataSize = frame_in->width * frame_in->height * frame_in->bytes_per_pixel;
 
-  memcpy (frame_out->data,frame_in->data,frame_out->dataSize);
+  frame_out->data = xnOSMalloc (frame_out->dataSize);
+  xnOSMemCopy (frame_out->data,frame_in->data,frame_out->dataSize);
 
   frame_out->frameIndex = frame_in->sequence;
   frame_out->sensorType = ONI_SENSOR_DEPTH;
