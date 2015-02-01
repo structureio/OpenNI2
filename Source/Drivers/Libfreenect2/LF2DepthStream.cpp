@@ -7,10 +7,23 @@ using namespace LF2;
 int
 LF2DepthStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
 {
-  frame_out->dataSize = frame_in->width * frame_in->height * frame_in->bytes_per_pixel;
+  // 1 DepthPixel is 2 byte
+  frame_out->dataSize = frame_in->width * frame_in->height * 2;
 
   frame_out->data = xnOSMalloc (frame_out->dataSize);
-  xnOSMemCopy (frame_out->data,frame_in->data,frame_out->dataSize);
+
+  const float* const in_array = (float*) frame_in->data;
+  uint16_t* const out_array = (uint16_t*) frame_out->data;
+  unsigned int t = 0;
+  for (unsigned int y = 0; y < frame_in->height; y++)
+	{
+      for (unsigned int x = 0; x < frame_in->width; x++)
+		{
+          out_array[t] = in_array[t];
+          ++t;
+        }
+    }
+
 
   frame_out->frameIndex = frame_in->sequence;
   frame_out->sensorType = ONI_SENSOR_DEPTH;
