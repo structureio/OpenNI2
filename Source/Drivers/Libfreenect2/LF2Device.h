@@ -15,14 +15,49 @@ namespace LF2 {
   public :
     LF2Device(libfreenect2::Freenect2Device* f2dev,LF2Driver* driver)
     {
+      static const int DEFAULT_FPS = 30;
       m_f2dev = f2dev;
       m_driver = driver;
+      // this is actually 3. but now color and ir are not supprted yet.
+      m_numSensors = 1;
+
+      m_sensors[0].sensorType = ONI_SENSOR_DEPTH;
+      m_sensors[0].numSupportedVideoModes = 1;
+      m_sensors[0].pSupportedVideoModes = XN_NEW_ARR(OniVideoMode, 1);
+      m_sensors[0].pSupportedVideoModes[0].pixelFormat = ONI_PIXEL_FORMAT_DEPTH_1_MM;
+      m_sensors[0].pSupportedVideoModes[0].fps = DEFAULT_FPS;
+      m_sensors[0].pSupportedVideoModes[0].resolutionX = 512;
+      m_sensors[0].pSupportedVideoModes[0].resolutionY = 424;
+
+      // m_sensors[1].sensorType = ONI_SENSOR_COLOR;
+      // m_sensors[1].numSupportedVideoModes = 2;
+      // m_sensors[1].pSupportedVideoModes = XN_NEW_ARR(OniVideoMode, 2);
+      // m_sensors[1].pSupportedVideoModes[0].pixelFormat = ONI_PIXEL_FORMAT_RGB888;
+      // m_sensors[1].pSupportedVideoModes[0].fps         = DEFAULT_FPS;
+      // m_sensors[1].pSupportedVideoModes[0].resolutionX = 960;
+      // m_sensors[1].pSupportedVideoModes[0].resolutionY = 540;
+
+      // m_sensors[1].pSupportedVideoModes[1].pixelFormat = ONI_PIXEL_FORMAT_RGB888;
+      // m_sensors[1].pSupportedVideoModes[1].fps         = DEFAULT_FPS;
+      // m_sensors[1].pSupportedVideoModes[1].resolutionX = 1920;
+      // m_sensors[1].pSupportedVideoModes[1].resolutionY = 1080;
+
+      // m_sensors[2].sensorType = ONI_SENSOR_IR;
+      // m_sensors[2].numSupportedVideoModes = 1;
+      // m_sensors[2].pSupportedVideoModes = XN_NEW_ARR(OniVideoMode, 1);
+      // m_sensors[2].pSupportedVideoModes[0].pixelFormat = ONI_PIXEL_FORMAT_GRAY16;
+      // m_sensors[2].pSupportedVideoModes[0].fps = DEFAULT_FPS;
+      // m_sensors[2].pSupportedVideoModes[0].resolutionX = 512;
+      // m_sensors[2].pSupportedVideoModes[0].resolutionY = 424;
+
     }
 
 	OniStatus
-    getSensorInfoList(OniSensorInfo**, int*)
+    getSensorInfoList(OniSensorInfo** pSensors, int* numSensors)
     {
-      return ONI_STATUS_NOT_IMPLEMENTED;
+      *numSensors = m_numSensors;
+      *pSensors = m_sensors;
+      return ONI_STATUS_OK;
     }
 
     oni::driver::StreamBase* 
@@ -31,6 +66,8 @@ namespace LF2 {
     void
     destroyStream (oni::driver::StreamBase*);
   protected:
+    int m_numSensors;
+    OniSensorInfo * m_sensors;
     libfreenect2::Freenect2Device* m_f2dev;
     LF2Driver* m_driver;
   };
