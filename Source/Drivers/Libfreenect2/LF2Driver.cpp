@@ -63,3 +63,5 @@ LF2Driver::shutdown ()
 
   m_devices.Clear ();
 }
+
+ONI_EXPORT_DRIVER(LF2Driver);

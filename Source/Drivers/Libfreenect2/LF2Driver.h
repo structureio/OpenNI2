@@ -13,6 +13,8 @@ namespace LF2 {
     public oni::driver::DriverBase
   {
   public:
+	LF2Driver(OniDriverServices* pDriverServices) : DriverBase(pDriverServices)	{}
+
     //! @note mode is no supported now.
     oni::driver::DeviceBase*
     deviceOpen (const char*,const char*);
