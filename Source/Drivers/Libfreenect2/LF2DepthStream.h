@@ -20,6 +20,7 @@ namespace LF2 {
     start ()
     {
       m_f2dev->setIrAndDepthFrameListener (this);
+      m_f2dev->start();
       return ONI_STATUS_OK;
     }
 
