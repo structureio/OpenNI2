@@ -65,3 +65,9 @@ LF2Driver::shutdown ()
 }
 
 ONI_EXPORT_DRIVER(LF2Driver);
+
+OniStatus
+LF2Driver::tryDevice (const char*)
+{
+  return ONI_STATUS_OK;
+}

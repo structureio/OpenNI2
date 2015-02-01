@@ -22,6 +22,9 @@ namespace LF2 {
     void
     deviceClose (oni::driver::DeviceBase*);
 
+	virtual OniStatus 
+    tryDevice(const char* uri);
+
     void
     shutdown ();
 
