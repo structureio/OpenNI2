@@ -8,9 +8,9 @@ namespace LF2 {
     public LF2Stream
   {
   public:
-    LF2DepthStream (libfreenect2::Freenect2Device * f2dev) : LF2Stream (f2dev){}
-
-    ~LF2DepthStream()
+    LF2DepthStream (libfreenect2::Freenect2Device * f2dev) : LF2Stream (f2dev) { }
+    
+    ~LF2DepthStream ()
     {
       stop ();
     }

@@ -29,11 +29,23 @@ namespace LF2 {
     virtual void
     stop () = 0;
 
+    virtual OniStatus
+    GetVideoMode (OniVideoMode* pVideoMode)
+    {
+      *pVideoMode = m_videoMode;
+      return ONI_STATUS_OK;
+    }
+
+	virtual OniStatus
+    getProperty(int propertyId, void* data, int* pDataSize);
+
   protected:
     virtual int
     BuildFrame (libfreenect2::Frame*,OniFrame* pFrame) = 0;
 
     libfreenect2::Freenect2Device *m_f2dev;
+
+    OniVideoMode m_videoMode;
   };
 }
 
