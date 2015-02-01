@@ -34,7 +34,7 @@ LF2DepthStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
 
   frame_out->sensorType = ONI_SENSOR_DEPTH;
   frame_out->stride = frame_in->width*sizeof(OniDepthPixel);
-  frame_out->timestamp = frame_in->sequence*33000;
+  frame_out->timestamp = frame_in->sequence*33;
 
   return 1;
 }
