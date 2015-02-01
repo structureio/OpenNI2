@@ -15,6 +15,9 @@ namespace LF2 {
   public:
 	LF2Driver(OniDriverServices* pDriverServices) : DriverBase(pDriverServices)	{}
 
+    virtual OniStatus
+    initialize(oni::driver::DeviceConnectedCallback, oni::driver::DeviceDisconnectedCallback, oni::driver::DeviceStateChangedCallback , void*);
+
     //! @note mode is no supported now.
     oni::driver::DeviceBase*
     deviceOpen (const char*,const char*);

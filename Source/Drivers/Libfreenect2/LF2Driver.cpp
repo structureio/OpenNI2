@@ -1,5 +1,9 @@
 #include "LF2Driver.h"
 #include "LF2Device.h"
+#include <XnOS.h>
+
+static const char VENDOR_VAL[] = "Microsoft";
+static const char NAME_VAL[] = "Kinect v2";
 
 using namespace LF2;
 using namespace oni::driver;
@@ -64,10 +68,45 @@ LF2Driver::shutdown ()
   m_devices.Clear ();
 }
 
-ONI_EXPORT_DRIVER(LF2Driver);
+OniStatus
+LF2Driver::initialize (DeviceConnectedCallback connectedCallback, DeviceDisconnectedCallback disconnectedCallback, DeviceStateChangedCallback deviceStateChangedCallback, void* pCookie)
+{
+  DriverBase::initialize (connectedCallback,disconnectedCallback,deviceStateChangedCallback,pCookie);
+  int num_of_device = m_f2.enumerateDevices ();
+
+  if (num_of_device == 0)
+    {
+      return ONI_STATUS_OK;
+    }
+
+  // discover Kinects
+  for (int t = 0; t < num_of_device; ++t)
+    {
+      Freenect2Device* dev = m_f2.openDevice (t);
+      OniDeviceInfo* pInfo = XN_NEW (OniDeviceInfo);
+      std::string serial = dev->getSerialNumber ();
+      
+      xnOSStrCopy (pInfo->uri,serial.c_str (),ONI_MAX_STR);      
+      xnOSStrCopy (pInfo->vendor,VENDOR_VAL,ONI_MAX_STR);
+      xnOSStrCopy (pInfo->name, NAME_VAL,ONI_MAX_STR);
+      deviceConnected (pInfo);
+      deviceStateChanged (pInfo,false);
+      
+      dev->close ();      
+    }
+  return ONI_STATUS_OK;  
+}
 
 OniStatus
 LF2Driver::tryDevice (const char*)
 {
   return ONI_STATUS_OK;
 }
+
+ONI_EXPORT_DRIVER(LF2Driver);
+
+
+
+
+
+
