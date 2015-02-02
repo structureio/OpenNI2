@@ -33,12 +33,6 @@ LF2DepthStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
   frame_out->videoMode.resolutionY = frame_in->height;
   frame_out->videoMode.fps = 30;
 
-  m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_DEPTH_1_MM;
-  m_videoMode.resolutionX = frame_in->width;
-  m_videoMode.resolutionY = frame_in->height;
-  m_videoMode.fps = 30;
-
-
   frame_out->width = frame_in->width;
   frame_out->height = frame_in->height;
 

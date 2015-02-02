@@ -8,7 +8,12 @@ namespace LF2 {
     public LF2Stream
   {
   public:
-    LF2DepthStream (libfreenect2::Freenect2Device * f2dev) : LF2Stream (f2dev) { }
+    LF2DepthStream (libfreenect2::Freenect2Device * f2dev) : LF2Stream (f2dev) { 
+      m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_DEPTH_1_MM;
+      m_videoMode.resolutionX = 512;
+      m_videoMode.resolutionY = 424;
+      m_videoMode.fps = 30;
+    }
     
     ~LF2DepthStream ()
     {
