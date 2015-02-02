@@ -26,6 +26,21 @@ LF2Stream::getProperty(int propertyId, void* data, int* pDataSize)
 
   switch (propertyId)
     {
+    case ONI_STREAM_PROPERTY_CROPPING:
+      {
+        if (*pDataSize != sizeof(OniCropping))
+          {
+            printf("Unexpected size: %d != %ld\n", *pDataSize, sizeof(OniCropping));
+            status = ONI_STATUS_ERROR;
+          }
+        ((OniCropping*) data)->enabled = false;
+        ((OniCropping*) data)->originX = 0;
+        ((OniCropping*) data)->originY = 0;
+        ((OniCropping*) data)->width = m_videoMode.resolutionX;
+        ((OniCropping*) data)->height = m_videoMode.resolutionY;
+        status = ONI_STATUS_OK;        
+        break;      
+      }      
     case ONI_STREAM_PROPERTY_VIDEO_MODE:
       {
         if (*pDataSize != sizeof(OniVideoMode))
