@@ -52,3 +52,32 @@ LF2DepthStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
   return 1;
 }
 
+OniStatus 
+LF2DepthStream::getProperty(int propertyId, void* data, int* pDataSize)
+{
+  OniStatus status = ONI_STATUS_NOT_SUPPORTED;
+
+  switch (propertyId)
+    {
+	case ONI_STREAM_PROPERTY_MAX_VALUE:
+      if (*pDataSize != sizeof(int))
+		{
+          return ONI_STATUS_BAD_PARAMETER;
+		}
+
+      *(int*)data = 10000;
+      return ONI_STATUS_OK;
+	case ONI_STREAM_PROPERTY_MIN_VALUE:
+      if (*pDataSize != sizeof(int))
+		{
+          return ONI_STATUS_BAD_PARAMETER;
+		}
+
+      *(int*)data = 0;
+      return ONI_STATUS_OK;
+    default:
+      return LF2Stream::getProperty(propertyId, data, pDataSize);
+    }
+
+  return status;  
+}

@@ -30,6 +30,9 @@ namespace LF2 {
       m_f2dev->setIrAndDepthFrameListener (NULL);
     }
 
+	OniStatus
+    getProperty(int propertyId, void* data, int* pDataSize);
+
   protected:
     int
     BuildFrame (libfreenect2::Frame*,OniFrame*);
