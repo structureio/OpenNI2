@@ -1,0 +1,7 @@
+#ifndef LF2COMMON_H
+#define LF2COMMON_H
+
+#define LF2_DEPTH_HORIZONTAL_FOV 70.6
+#define LF2_DEPTH_VERTICAL_FOV 60
+
+#endif // LF2COMMON_H

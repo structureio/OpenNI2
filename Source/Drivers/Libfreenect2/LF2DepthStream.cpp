@@ -1,6 +1,7 @@
 #include "LF2DepthStream.h"
 #include <XnOS.h>
-
+#include "LF2Common.h"
+#include <XnMath.h>
 
 using namespace LF2;
 
@@ -53,6 +54,24 @@ LF2DepthStream::getProperty(int propertyId, void* data, int* pDataSize)
 
   switch (propertyId)
     {
+    case ONI_STREAM_PROPERTY_HORIZONTAL_FOV:
+      {
+        float* val = (float*)data;
+        XnDouble tmp;
+        tmp =  LF2_DEPTH_HORIZONTAL_FOV * xnl::Math::DTR;
+        *val = (float)tmp;
+        status = ONI_STATUS_OK;
+        break;
+      }
+    case ONI_STREAM_PROPERTY_VERTICAL_FOV:
+      {
+        float* val = (float*)data;
+        XnDouble tmp;
+        tmp =  LF2_DEPTH_VERTICAL_FOV * xnl::Math::DTR;
+        *val = (float)tmp;
+        status = ONI_STATUS_OK;
+        break;
+      }		
 	case ONI_STREAM_PROPERTY_MAX_VALUE:
       if (*pDataSize != sizeof(int))
 		{
