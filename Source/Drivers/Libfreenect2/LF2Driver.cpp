@@ -1,5 +1,7 @@
 #include "LF2Driver.h"
 #include "LF2Device.h"
+#include <libfreenect2/depth_packet_processor.h>
+#include <libfreenect2/packet_pipeline.h>
 #include <XnOS.h>
 
 static const char VENDOR_VAL[] = "Microsoft";
@@ -22,7 +24,11 @@ LF2Driver::deviceOpen(const char * uri, const char *)
       return NULL;
     }
 
-  f2dev = m_f2.openDevice (uri);
+  DepthPacketProcessor::Config config;
+  DefaultPacketPipeline* packetPipeline = new DefaultPacketPipeline ();
+  config.MaxDepth = 10000;
+  packetPipeline->getDepthPacketProcessor()->setConfiguration(config);
+  f2dev = m_f2.openDevice (uri,packetPipeline);
 
   if (f2dev == 0)
     {
