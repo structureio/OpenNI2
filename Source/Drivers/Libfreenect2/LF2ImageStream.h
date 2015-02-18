@@ -8,7 +8,12 @@ namespace LF2 {
     public LF2Stream
   {
   public:
-    LF2ImageStream (libfreenect2::Freenect2Device * f2dev) : LF2Stream (f2dev) {}
+    LF2ImageStream (libfreenect2::Freenect2Device * f2dev) : LF2Stream (f2dev) {
+          m_videoMode.pixelFormat = ONI_PIXEL_FORMAT_RGB888;
+          m_videoMode.resolutionX = 1920;
+          m_videoMode.resolutionY = 1080;
+          m_videoMode.fps = 30;
+      }
 
     ~LF2ImageStream()
     {
@@ -20,11 +25,18 @@ namespace LF2 {
     start ()
     {
       m_f2dev->setColorFrameListener (this);
+      m_f2dev->start ();
       return ONI_STATUS_OK;
     }
 
     void
-    stop ();
+    stop ()
+    {
+        m_f2dev->setColorFrameListener (NULL);
+    }
+
+	OniStatus
+    getProperty(int propertyId, void* data, int* pDataSize);
 
   protected:
     int

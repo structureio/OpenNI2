@@ -15,21 +15,16 @@ LF2Device::createStream (OniSensorType sensorType)
       LF2DepthStream* pDepth = XN_NEW(LF2DepthStream,m_f2dev);
       return pDepth;
     }
-  else
+  else if (sensorType == ONI_SENSOR_COLOR)
     {
-      printf("This type of stream is not implemented yet\n");
-      abort ();
+      LF2ImageStream* pImage = XN_NEW(LF2ImageStream,m_f2dev);
+      return pImage;
     }
-  // else if (sensorType == ONI_SENSOR_COLOR)
-  //   {
-  //     LF2ImageStream* pImage = XN_NEW(LF2ImageStream);
-  //     return pImage;
-  //   }
-  // else if (sensorType == ONI_SENSOR_IR)
-  //   {
-  //     LF2IrStream* pIr = XN_NEW(LF2IrStream);
-  //     return pIr;
-  //   }
+  else if (sensorType == ONI_SENSOR_IR)
+    {
+      LF2IrStream* pIr = XN_NEW(LF2IrStream,m_f2dev);
+      return pIr;
+    }
 
   return NULL;
 }
