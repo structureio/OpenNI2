@@ -13,6 +13,8 @@ namespace LF2 {
           m_videoMode.resolutionX = 1920;
           m_videoMode.resolutionY = 1080;
           m_videoMode.fps = 30;
+
+          m_frameType = libfreenect2::Frame::Color;
       }
 
     ~LF2ImageStream()

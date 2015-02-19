@@ -7,7 +7,7 @@ using namespace libfreenect2;
 bool
 LF2Stream::onNewFrame (Frame::Type type,Frame* frame)
 {    
-  if ((m_videoMode.pixelFormat == ONI_PIXEL_FORMAT_DEPTH_1_MM && type != Frame::Depth) || (m_videoMode.pixelFormat != ONI_PIXEL_FORMAT_DEPTH_1_MM && type != Frame::Ir))
+  if (m_frameType != type)
     {
       return false;      
     }

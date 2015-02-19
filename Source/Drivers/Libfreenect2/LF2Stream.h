@@ -46,6 +46,7 @@ namespace LF2 {
     libfreenect2::Freenect2Device *m_f2dev;
 
     OniVideoMode m_videoMode;
+    libfreenect2::Frame::Type m_frameType;
   };
 }
 

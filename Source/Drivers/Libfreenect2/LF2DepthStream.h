@@ -13,6 +13,8 @@ namespace LF2 {
       m_videoMode.resolutionX = 512;
       m_videoMode.resolutionY = 424;
       m_videoMode.fps = 30;
+
+      m_frameType = libfreenect2::Frame::Depth;
     }
     
     ~LF2DepthStream ()
