@@ -659,7 +659,7 @@ JNIEXPORT jint JNICALL Java_org_openni_NativeMethods_oniGetDeviceList
 				  uriObj, vendorObj, nameObj, m_pDeviceInfos[i].usbVendorId, m_pDeviceInfos[i].usbProductId);
 			  jclass vectorCls = (*env).FindClass("java/util/List");
 			  jmethodID methodId = (*env).GetMethodID(vectorCls, "add", "(Ljava/lang/Object;)Z");
-			  (*env).CallVoidMethod(deviceListObj, methodId, deviceInfObj);
+			  (*env).CallBooleanMethod(deviceListObj, methodId, deviceInfObj);
 
 		  }
 	  }	  
