@@ -92,6 +92,7 @@ class Harvest:
         self.copySharedObject(binDriversDir, 'OniFile', targetDriversDir)
         self.copySharedObject(binDriversDir, 'PS1080', targetDriversDir)
         self.copySharedObject(binDriversDir, 'PSLink', targetDriversDir)
+        self.copySharedObject(binDriversDir, 'Libfreenect2', targetDriversDir)
         shutil.copy(os.path.join(self.rootDir, 'Config', 'OpenNI2', 'Drivers', 'PS1080.ini'), targetDriversDir)
         shutil.copy(os.path.join(self.rootDir, 'Config', 'OpenNI2', 'Drivers', 'PSLink.ini'), targetDriversDir)
         if self.osName == 'Windows':
