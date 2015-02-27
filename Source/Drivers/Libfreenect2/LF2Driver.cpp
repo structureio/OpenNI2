@@ -11,6 +11,11 @@ using namespace LF2;
 using namespace oni::driver;
 using namespace libfreenect2;
 
+namespace libfreenect2 {
+  extern PacketPipeline *createDefaultPacketPipeline();  
+}
+
+
 DeviceBase*
 LF2Driver::deviceOpen(const char * uri, const char *)
 {
@@ -25,7 +30,7 @@ LF2Driver::deviceOpen(const char * uri, const char *)
     }
 
   DepthPacketProcessor::Config config;
-  DefaultPacketPipeline* packetPipeline = new DefaultPacketPipeline ();
+  PacketPipeline* packetPipeline = createDefaultPacketPipeline();
   config.MaxDepth = 10000;
   packetPipeline->getDepthPacketProcessor()->setConfiguration(config);
   f2dev = m_f2.openDevice (uri,packetPipeline);
