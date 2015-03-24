@@ -74,7 +74,7 @@ public class CoordinateConverter {
 	 *        coordinates
 	 * @param worldZ The Z coordinate of the point to be converted, measured in millimeters in World
 	 *        coordinates
-	 * @return Point3D<Integer> Coordinate of the output value, and depth measured in the
+	 * @return Coordinate of the output value, and depth measured in the
 	 *         {@link PixelFormat} of depthStream
 	 */
 	public static Point3D<Integer> convertWorldToDepthInt(final VideoStream depthStream,
@@ -105,10 +105,10 @@ public class CoordinateConverter {
 	 * @return Point3DPoint to a place to store: the X coordinate of the output value, measured in
 	 *         pixels with 0.0 at far left of the image
 	 *         <p>
-	 *         <t> the Y coordinate of the output value, measured in pixels with 0.0 at the top of the
+	 *         the Y coordinate of the output value, measured in pixels with 0.0 at the top of the
 	 *         image
 	 *         <p>
-	 *         <t> the Z(depth) coordinate of the output value, measured in millimeters with 0.0 at
+	 *         the Z(depth) coordinate of the output value, measured in millimeters with 0.0 at
 	 *         the camera lens
 	 */
 	public static Point3D<Float> convertWorldToDepthFloat(final VideoStream depthStream,
@@ -135,7 +135,7 @@ public class CoordinateConverter {
 	 *        top of the image
 	 * @param depthZ the Z(depth) coordinate of the point to be converted, measured in the
 	 *        {@link PixelFormat} of depthStream
-	 * @return Point3D<Float> to a place to store the X,Y,Z coordinate of the output value, measured
+	 * @return a place to store the X,Y,Z coordinate of the output value, measured
 	 *         in millimeters in World coordinates
 	 */
 	public static Point3D<Float> convertDepthToWorld(final VideoStream depthStream, int depthX,
@@ -163,7 +163,7 @@ public class CoordinateConverter {
 	 *        top of the image
 	 * @param depthZ Z(depth) coordinate of the point to be converted, measured in the
 	 *        {@link PixelFormat}of depthStream
-	 * @return Point3D<Float> to a place to store the X coordinate of the output value, measured in
+	 * @return a place to store the X coordinate of the output value, measured in
 	 *         millimeters in World coordinates
 	 */
 	public static Point3D<Float> convertDepthToWorld(final VideoStream depthStream, float depthX,
