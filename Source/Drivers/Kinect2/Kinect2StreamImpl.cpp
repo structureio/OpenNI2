@@ -1,8 +1,6 @@
 #include "Kinect2StreamImpl.h"
 #include "BaseKinect2Stream.h"
 
-#include <Kinect.h>
-
 using namespace oni::driver;
 using namespace kinect2_device;
 using namespace xnl;
@@ -131,6 +129,11 @@ void Kinect2StreamImpl::mainLoop()
   m_running = TRUE;
   while (m_running) {
     int width, height;
+
+    // wait for new frame available notification
+    HANDLE hEvents[] = { reinterpret_cast<HANDLE>(m_hWaitable) };
+    WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, true, INFINITE);
+
     void* data = populateFrameBuffer(width, height);
 
     LARGE_INTEGER qpc = {0};
@@ -318,6 +321,10 @@ void Kinect2StreamImpl::openFrameReader()
         m_pFrameReader.color->Release();
         m_pFrameReader.color = NULL;
       }
+      else
+      {
+        m_pFrameReader.color->SubscribeFrameArrived(&m_hWaitable);
+      }
     }
     if (frameSource) {
       frameSource->Release();
@@ -332,6 +339,10 @@ void Kinect2StreamImpl::openFrameReader()
         m_pFrameReader.depth->Release();
         m_pFrameReader.depth = NULL;
       }
+      else
+      {
+        m_pFrameReader.depth->SubscribeFrameArrived(&m_hWaitable);
+      }
     }
     if (frameSource) {
       frameSource->Release();
@@ -345,6 +356,10 @@ void Kinect2StreamImpl::openFrameReader()
       if (FAILED(hr) && m_pFrameReader.infrared) {
         m_pFrameReader.infrared->Release();
         m_pFrameReader.infrared = NULL;
+      }
+      else
+      {
+        m_pFrameReader.infrared->SubscribeFrameArrived(&m_hWaitable);
       }
     }
     if (frameSource) {
@@ -376,71 +391,102 @@ void* Kinect2StreamImpl::populateFrameBuffer(int& buffWidth, int& buffHeight)
 
   if (m_sensorType == ONI_SENSOR_COLOR) {
     if (m_pFrameReader.color && m_pFrameBuffer.color) {
-      buffWidth = 1920;
-      buffHeight = 1080;
+      IColorFrameArrivedEventArgs* pColorArgs = nullptr;
+      HRESULT hr = m_pFrameReader.color->GetFrameArrivedEventData(m_hWaitable, &pColorArgs);
+      if (SUCCEEDED(hr)){
+        // Reference
+        IColorFrameReference* pColorReference = nullptr;
+        hr = pColorArgs->get_FrameReference(&pColorReference);
+        if (SUCCEEDED(hr)){
+          // Frame
+          IColorFrame* frame = nullptr;
+          hr = pColorReference->AcquireFrame(&frame);
+          if (SUCCEEDED(hr)) {
+            ColorImageFormat imageFormat = ColorImageFormat_None;
+            hr = frame->get_RawColorImageFormat(&imageFormat);
+            if (SUCCEEDED(hr)) {
+              buffWidth = 1920;
+              buffHeight = 1080;
 
-      IColorFrame* frame = NULL;
-      HRESULT hr = m_pFrameReader.color->AcquireLatestFrame(&frame);
-      if (SUCCEEDED(hr)) {
-        ColorImageFormat imageFormat = ColorImageFormat_None;
-        hr = frame->get_RawColorImageFormat(&imageFormat);
-        if (SUCCEEDED(hr)) {
-          if (imageFormat == ColorImageFormat_Bgra) {
-            RGBQUAD* data;
-            UINT bufferSize;
-            frame->AccessRawUnderlyingBuffer(&bufferSize, reinterpret_cast<BYTE**>(&data));
-            memcpy(m_pFrameBuffer.color, data, 1920*1080*sizeof(RGBQUAD));
+              if (imageFormat == ColorImageFormat_Bgra) {
+                RGBQUAD* data;
+                UINT bufferSize;
+                frame->AccessRawUnderlyingBuffer(&bufferSize, reinterpret_cast<BYTE**>(&data));
+                memcpy(m_pFrameBuffer.color, data, buffWidth * buffHeight * sizeof(RGBQUAD));
+              }
+              else {
+                frame->CopyConvertedFrameDataToArray(buffWidth * buffHeight * sizeof(RGBQUAD), reinterpret_cast<BYTE*>(m_pFrameBuffer.color), ColorImageFormat_Bgra);
+              }
+            }
           }
-          else {
-            frame->CopyConvertedFrameDataToArray(1920*1080*sizeof(RGBQUAD), reinterpret_cast<BYTE*>(m_pFrameBuffer.color), ColorImageFormat_Bgra);
+          if (frame) {
+            frame->Release();
           }
+
+          return reinterpret_cast<void*>(m_pFrameBuffer.color);
         }
       }
-      if (frame) {
-        frame->Release();
-      }
-
-      return reinterpret_cast<void*>(m_pFrameBuffer.color);
     }
   }
   else if (m_sensorType == ONI_SENSOR_DEPTH) {
     if (m_pFrameReader.depth && m_pFrameBuffer.depth) {
-      buffWidth = 512;
-      buffHeight = 424;
+      IDepthFrameArrivedEventArgs * pArgs = nullptr;
+      HRESULT hr = m_pFrameReader.depth->GetFrameArrivedEventData(m_hWaitable, &pArgs);
+      if (SUCCEEDED(hr)){
+        // Reference
+        IDepthFrameReference* pReference = nullptr;
+        hr = pArgs->get_FrameReference(&pReference);
+        if (SUCCEEDED(hr)){
+          // Frame
+          IDepthFrame* frame = nullptr;
+          hr = pReference->AcquireFrame(&frame);
+          if (SUCCEEDED(hr)) {
+            buffWidth = 512;
+            buffHeight = 424;
+            TIMESPAN time;
+            frame->get_RelativeTime(&time);
+            UINT16* data;
+            UINT bufferSize;
+            frame->AccessUnderlyingBuffer(&bufferSize, &data);
+            memcpy(m_pFrameBuffer.depth, data, buffWidth * buffHeight * sizeof(UINT16));
+          }
+          if (frame) {
+            frame->Release();
+          }
 
-      IDepthFrame* frame = NULL;
-      HRESULT hr = m_pFrameReader.depth->AcquireLatestFrame(&frame);
-      if (SUCCEEDED(hr)) {
-        UINT16* data;
-        UINT bufferSize;
-        frame->AccessUnderlyingBuffer(&bufferSize, &data);
-        memcpy(m_pFrameBuffer.depth, data, 512*424*sizeof(UINT16));
+          return reinterpret_cast<void*>(m_pFrameBuffer.depth);
+        }
       }
-      if (frame) {
-        frame->Release();
-      }
-
-      return reinterpret_cast<void*>(m_pFrameBuffer.depth);
     }
   }
   else { // ONI_SENSOR_IR
     if (m_pFrameReader.infrared && m_pFrameBuffer.infrared) {
-      buffWidth = 512;
-      buffHeight = 424;
+      IInfraredFrameArrivedEventArgs * pArgs = nullptr;
+      HRESULT hr = m_pFrameReader.infrared->GetFrameArrivedEventData(m_hWaitable, &pArgs);
+      if (SUCCEEDED(hr)){
+        // Reference
+        IInfraredFrameReference* pReference = nullptr;
+        hr = pArgs->get_FrameReference(&pReference);
+        if (SUCCEEDED(hr)){
+          // Frame
+          IInfraredFrame* frame = nullptr;
+          hr = pReference->AcquireFrame(&frame);
+          if (SUCCEEDED(hr)) {
+            buffWidth = 512;
+            buffHeight = 424;
 
-      IInfraredFrame* frame = NULL;
-      HRESULT hr = m_pFrameReader.infrared->AcquireLatestFrame(&frame);
-      if (SUCCEEDED(hr)) {
-        UINT16* data;
-        UINT bufferSize;
-        frame->AccessUnderlyingBuffer(&bufferSize, &data);
-        memcpy(m_pFrameBuffer.infrared, data, 512*424*sizeof(UINT16));
-      }
-      if (frame) {
-        frame->Release();
-      }
+            UINT16* data;
+            UINT bufferSize;
+            frame->AccessUnderlyingBuffer(&bufferSize, &data);
+            memcpy(m_pFrameBuffer.infrared, data, buffWidth * buffHeight * sizeof(UINT16));
+          }
+          if (frame) {
+            frame->Release();
+          }
 
-      return reinterpret_cast<void*>(m_pFrameBuffer.infrared);
+          return reinterpret_cast<void*>(m_pFrameBuffer.infrared);
+        }
+      }
     }
   }
 
