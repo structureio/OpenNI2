@@ -6,7 +6,8 @@ using namespace oni::driver;
 using namespace kinect2_device;
 #define DEFAULT_FPS 30
 
-#define DEVICE_MAX_DEPTH_VAL 10000
+#define DEVICE_MIN_DEPTH_VAL 500
+#define DEVICE_MAX_DEPTH_VAL 9500
 #define FILTER_RELIABLE_DEPTH_VALUE(VALUE) (((VALUE) < DEVICE_MAX_DEPTH_VAL) ? (VALUE) : 0)
 
 DepthKinect2Stream::DepthKinect2Stream(Kinect2StreamImpl* pStreamImpl)
@@ -69,6 +70,13 @@ OniStatus DepthKinect2Stream::getProperty(int propertyId, void* data, int* pData
   OniStatus status = ONI_STATUS_NOT_SUPPORTED;
   switch (propertyId)
   {
+  case ONI_STREAM_PROPERTY_MIN_VALUE:
+  {
+    XnInt * val = (XnInt *)data;
+    *val = DEVICE_MIN_DEPTH_VAL;
+    status = ONI_STATUS_OK;
+    break;
+  }
   case ONI_STREAM_PROPERTY_MAX_VALUE:
     {
       XnInt * val = (XnInt *)data;
@@ -96,6 +104,7 @@ OniBool DepthKinect2Stream::isPropertySupported(int propertyId)
   OniBool status = FALSE;
   switch (propertyId)
   {
+  case ONI_STREAM_PROPERTY_MIN_VALUE:
   case ONI_STREAM_PROPERTY_MAX_VALUE:
   case ONI_STREAM_PROPERTY_MIRRORING:
     status = TRUE;
