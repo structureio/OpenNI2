@@ -168,17 +168,21 @@ void DepthKinect2Stream::copyDepthPixelsWithImageRegistration(const UINT16* data
   const ColorSpacePoint* mappedCoordsIter = m_colorSpaceCoords;
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      const float fX = mappedCoordsIter->X*xFactor;
-      const float fY = mappedCoordsIter->Y*yFactor;
-      const int cx = static_cast<int>(fX + 0.5f);
-      const int cy = static_cast<int>(fY + 0.5f);
-      if (cx >= 0 && cy >= 0 && cx < width && cy < height) {
-        unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
-        const unsigned short d = FILTER_RELIABLE_DEPTH_VALUE(*iter);
-        unsigned short* const p = data_out + cx + cy * width;
-        if (*p == 0 || *p > d) *p = d;
+      if ( mappedCoordsIter->X >= 0.f && mappedCoordsIter->X < 1920.0f
+        && mappedCoordsIter->Y >= 0.f && mappedCoordsIter->Y < 1080.0f)
+      {
+        const float fX = mappedCoordsIter->X*xFactor;
+        const float fY = mappedCoordsIter->Y*yFactor;
+        const int cx = static_cast<int>(fX + 0.5f);
+        const int cy = static_cast<int>(fY + 0.5f);
+        if (cx >= 0 && cy >= 0 && cx < width && cy < height) {
+          unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
+          const unsigned short d = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+          unsigned short* const p = data_out + cx + cy * width;
+          if (*p == 0 || *p > d) *p = d;
+        }
       }
-      mappedCoordsIter++;
+      ++mappedCoordsIter;
     }
   }
 
@@ -205,7 +209,7 @@ void DepthKinect2Stream::copyDepthPixelsWithImageRegistration(const UINT16* data
       else {
         *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
       }
-      data_out++;
+      ++data_out;
     }
   }
 }
