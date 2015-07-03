@@ -6,7 +6,8 @@ using namespace oni::driver;
 using namespace kinect2_device;
 #define DEFAULT_FPS 30
 
-#define DEVICE_MAX_DEPTH_VAL 10000
+#define DEVICE_MIN_DEPTH_VAL 500
+#define DEVICE_MAX_DEPTH_VAL 9500
 #define FILTER_RELIABLE_DEPTH_VALUE(VALUE) (((VALUE) < DEVICE_MAX_DEPTH_VAL) ? (VALUE) : 0)
 
 DepthKinect2Stream::DepthKinect2Stream(Kinect2StreamImpl* pStreamImpl)
@@ -69,17 +70,17 @@ OniStatus DepthKinect2Stream::getProperty(int propertyId, void* data, int* pData
   OniStatus status = ONI_STATUS_NOT_SUPPORTED;
   switch (propertyId)
   {
+  case ONI_STREAM_PROPERTY_MIN_VALUE:
+  {
+    XnInt * val = (XnInt *)data;
+    *val = DEVICE_MIN_DEPTH_VAL;
+    status = ONI_STATUS_OK;
+    break;
+  }
   case ONI_STREAM_PROPERTY_MAX_VALUE:
     {
       XnInt * val = (XnInt *)data;
       *val = DEVICE_MAX_DEPTH_VAL;
-      status = ONI_STATUS_OK;
-      break;
-    }
-  case ONI_STREAM_PROPERTY_MIRRORING:
-    {
-      XnBool * val = (XnBool *)data;
-      *val = TRUE;
       status = ONI_STATUS_OK;
       break;
     }
@@ -96,9 +97,8 @@ OniBool DepthKinect2Stream::isPropertySupported(int propertyId)
   OniBool status = FALSE;
   switch (propertyId)
   {
+  case ONI_STREAM_PROPERTY_MIN_VALUE:
   case ONI_STREAM_PROPERTY_MAX_VALUE:
-  case ONI_STREAM_PROPERTY_MIRRORING:
-    status = TRUE;
   default:
     status = BaseKinect2Stream::isPropertySupported(propertyId);
     break;
@@ -129,11 +129,25 @@ void DepthKinect2Stream::copyDepthPixelsStraight(const UINT16* data_in, int widt
   const int frameHeight = pFrame->height * yStride;
 
   unsigned short* data_out = (unsigned short*) pFrame->data;
-  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
-    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
-      unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
-      *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
-      data_out++;
+  if (!m_mirroring)
+  {
+    for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+      for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+        unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
+        *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+        data_out++;
+      }
+    }
+  }
+  else
+  {
+    // to mirror the image, we run through every line backwards
+    for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+      for (int x = frameX + frameWidth - 1; x >= frameX; x -= xStride) {
+        unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
+        *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+        data_out++;
+      }
     }
   }
 }
@@ -168,44 +182,79 @@ void DepthKinect2Stream::copyDepthPixelsWithImageRegistration(const UINT16* data
   const ColorSpacePoint* mappedCoordsIter = m_colorSpaceCoords;
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      const float fX = mappedCoordsIter->X*xFactor;
-      const float fY = mappedCoordsIter->Y*yFactor;
-      const int cx = static_cast<int>(fX + 0.5f);
-      const int cy = static_cast<int>(fY + 0.5f);
-      if (cx >= 0 && cy >= 0 && cx < width && cy < height) {
-        unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
-        const unsigned short d = FILTER_RELIABLE_DEPTH_VALUE(*iter);
-        unsigned short* const p = data_out + cx + cy * width;
-        if (*p == 0 || *p > d) *p = d;
+      if ( mappedCoordsIter->X >= 0.f && mappedCoordsIter->X < 1920.0f
+        && mappedCoordsIter->Y >= 0.f && mappedCoordsIter->Y < 1080.0f)
+      {
+        const float fX = mappedCoordsIter->X*xFactor;
+        const float fY = mappedCoordsIter->Y*yFactor;
+        const int cx = static_cast<int>(fX + 0.5f);
+        const int cy = static_cast<int>(fY + 0.5f);
+        if (cx >= 0 && cy >= 0 && cx < width && cy < height) {
+          unsigned short* iter = const_cast<unsigned short*>(data_in + (y*width + x));
+          const unsigned short d = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+          unsigned short* const p = data_out + cx + cy * width;
+          if (*p == 0 || *p > d) *p = d;
+        }
       }
-      mappedCoordsIter++;
+      ++mappedCoordsIter;
     }
   }
 
   // Fill vertical gaps caused by the difference in the aspect ratio between depth and color resolutions
   data_out = (unsigned short*) pFrame->data;
-  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
-    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
-      unsigned short* iter = const_cast<unsigned short*>(m_registeredDepthMap + (y*width + x));
-      if (*iter == 0) {
-        unsigned short davg = 0;
-        int dw = 0;
-        for (int ky = max(y - 1, 0); ky <= y + 1 && ky < height; ky++) {
-          unsigned short* kiter = const_cast<unsigned short*>(m_registeredDepthMap + (ky*width + x));
-          if (*kiter != 0) {
-            davg += *kiter;
-            dw += abs(ky - y);
+  // we only need to handle mirroring in this second loop, because only here we actually write to the OpenNi frame
+  if (!m_mirroring)
+  {
+    for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+      for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+        unsigned short* iter = const_cast<unsigned short*>(m_registeredDepthMap + (y*width + x));
+        if (*iter == 0) {
+          unsigned short davg = 0;
+          int dw = 0;
+          for (int ky = max(y - 1, 0); ky <= y + 1 && ky < height; ky++) {
+            unsigned short* kiter = const_cast<unsigned short*>(m_registeredDepthMap + (ky*width + x));
+            if (*kiter != 0) {
+              davg += *kiter;
+              dw += abs(ky - y);
+            }
+          }
+          *data_out = davg;
+          if (dw) {
+            *data_out /= dw;
           }
         }
-        *data_out = davg;
-        if (dw) {
-          *data_out /= dw;
+        else {
+          *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
         }
+        ++data_out;
       }
-      else {
-        *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+    }
+  }
+  else
+  {
+    for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+      for (int x = frameX + frameWidth - 1; x >= frameX; x -= xStride) {
+        unsigned short* iter = const_cast<unsigned short*>(m_registeredDepthMap + (y*width + x));
+        if (*iter == 0) {
+          unsigned short davg = 0;
+          int dw = 0;
+          for (int ky = max(y - 1, 0); ky <= y + 1 && ky < height; ky++) {
+            unsigned short* kiter = const_cast<unsigned short*>(m_registeredDepthMap + (ky*width + x));
+            if (*kiter != 0) {
+              davg += *kiter;
+              dw += abs(ky - y);
+            }
+          }
+          *data_out = davg;
+          if (dw) {
+            *data_out /= dw;
+          }
+        }
+        else {
+          *data_out = FILTER_RELIABLE_DEPTH_VALUE(*iter);
+        }
+        ++data_out;
       }
-      data_out++;
     }
   }
 }

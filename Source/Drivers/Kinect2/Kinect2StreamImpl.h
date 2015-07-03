@@ -4,12 +4,7 @@
 #include "BaseKinect2Stream.h"
 #include "XnList.h"
 
-struct IKinectSensor;
-struct ICoordinateMapper;
-struct IFrameDescription;
-struct IColorFrameReader;
-struct IDepthFrameReader;
-struct IInfraredFrameReader;
+#include <Kinect.h>
 
 namespace kinect2_device
 {
@@ -71,6 +66,8 @@ namespace kinect2_device
       OniImageRegistrationMode m_imageRegistrationMode;
       OniVideoMode m_videoMode;
       xnl::List<BaseKinect2Stream*> m_streamList;
+
+      WAITABLE_HANDLE m_hWaitable;
 
       // Thread
       bool m_running;

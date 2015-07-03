@@ -7,9 +7,10 @@ using namespace kinect2_device;
 
 BaseKinect2Stream::BaseKinect2Stream(Kinect2StreamImpl* pStreamImpl)
   : m_pStreamImpl(pStreamImpl)
+  , m_running(false)
+  , m_mirroring(false)
+  , m_frameIdx(0)
 {
-  m_running = false;
-  m_frameIdx = 0;
   m_cropping.enabled = FALSE;
   pStreamImpl->addStream(this);
 }
@@ -77,6 +78,18 @@ OniStatus BaseKinect2Stream::getProperty(int propertyId, void* data, int* pDataS
       status = GetVideoMode((OniVideoMode*)data);
     }
     break;
+  case ONI_STREAM_PROPERTY_MIRRORING:
+    if (*pDataSize != sizeof(OniBool))
+    {
+      printf("Unexpected size: %d != %d\n", *pDataSize, sizeof(OniBool));
+      status = ONI_STATUS_ERROR;
+    }
+    else
+    {
+      *(static_cast<OniBool*>(data)) = m_mirroring;
+      status = ONI_STATUS_OK;
+    }
+    break;
   default:
     status = ONI_STATUS_NOT_SUPPORTED;
     break;
@@ -106,6 +119,16 @@ OniStatus BaseKinect2Stream::setProperty(int propertyId, const void* data, int d
     }
     status = SetVideoMode((OniVideoMode*)data);
   }
+  else if (propertyId == ONI_STREAM_PROPERTY_MIRRORING)
+  {
+    if (dataSize != sizeof(OniBool))
+    {
+      printf("Unexpected size: %d != %d\n", dataSize, sizeof(OniBool));
+      status = ONI_STATUS_ERROR;
+    }
+    m_mirroring = *(static_cast<const OniBool*>(data)) == TRUE;
+    status = ONI_STATUS_OK;
+  }
   return status;
 }
 
@@ -118,6 +141,7 @@ OniBool BaseKinect2Stream::isPropertySupported(int propertyId)
   case ONI_STREAM_PROPERTY_HORIZONTAL_FOV:
   case ONI_STREAM_PROPERTY_VERTICAL_FOV:
   case ONI_STREAM_PROPERTY_VIDEO_MODE:
+  case ONI_STREAM_PROPERTY_MIRRORING:
     status = TRUE;
     break;
   default:

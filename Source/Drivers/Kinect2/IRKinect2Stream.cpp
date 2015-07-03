@@ -51,11 +51,24 @@ void IRKinect2Stream::frameReady(void* data, int width, int height, double times
   const int frameY = pFrame->cropOriginY * yStride;
   const int frameWidth = pFrame->width * xStride;
   const int frameHeight = pFrame->height * yStride;
-  for (int y = frameY; y < frameY + frameHeight; y += yStride) {
-    for (int x = frameX; x < frameX + frameWidth; x += xStride) {
-      unsigned short* iter = data_in + (y*width + x);
-      *data_out = *iter;
-      data_out++;
+  if (!m_mirroring)
+  {
+    for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+      for (int x = frameX; x < frameX + frameWidth; x += xStride) {
+        unsigned short* iter = data_in + (y*width + x);
+        *data_out = *iter;
+        data_out++;
+      }
+    }
+  }
+  else
+  {
+    for (int y = frameY; y < frameY + frameHeight; y += yStride) {
+      for (int x = frameX + frameWidth - 1; x >= frameX; x -= xStride) {
+        unsigned short* iter = data_in + (y*width + x);
+        *data_out = *iter;
+        data_out++;
+      }
     }
   }
 
