@@ -371,14 +371,17 @@ void Kinect2StreamImpl::openFrameReader()
 void Kinect2StreamImpl::closeFrameReader()
 {
   if (m_sensorType == ONI_SENSOR_COLOR && m_pFrameReader.color) {
+    m_pFrameReader.color->UnsubscribeFrameArrived(m_hWaitable);
     m_pFrameReader.color->Release();
     m_pFrameReader.color = NULL;
   }
   else if (m_sensorType == ONI_SENSOR_DEPTH && m_pFrameReader.depth) {
+    m_pFrameReader.depth->UnsubscribeFrameArrived(m_hWaitable);
     m_pFrameReader.depth->Release();
     m_pFrameReader.depth = NULL;
   }
   else if (m_pFrameReader.infrared) { // ONI_SENSOR_IR
+    m_pFrameReader.infrared->UnsubscribeFrameArrived(m_hWaitable);
     m_pFrameReader.infrared->Release();
     m_pFrameReader.infrared = NULL;
   }
