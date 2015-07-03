@@ -34,6 +34,7 @@ namespace kinect2_device
       Kinect2StreamImpl *m_pStreamImpl;
       OniVideoMode m_videoMode;
       OniCropping m_cropping;
+      bool m_mirroring;
       bool m_running;
       int m_frameIdx;
   };
