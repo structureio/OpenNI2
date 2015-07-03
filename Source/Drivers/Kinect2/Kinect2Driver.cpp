@@ -40,11 +40,15 @@ OniStatus Kinect2Driver::initialize(DeviceConnectedCallback connectedCallback,
   }
 
   // Wait some time to let the sensor initialize
-  Sleep(500);
-
   BOOLEAN available;
-  hr = pKinectSensor->get_IsAvailable(&available);
-  if (FAILED(hr) || !available) {
+  int count = 0;
+  while ((FAILED(pKinectSensor->get_IsAvailable(&available)) || !available) && count < 10)
+  {
+    Sleep(100);
+    ++count;
+  }
+
+  if (!available) {
     pKinectSensor->Close();
     pKinectSensor->Release();
     return ONI_STATUS_NO_DEVICE;
