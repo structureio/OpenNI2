@@ -6,7 +6,7 @@ Features
 
 Requirement
 ===========
-* libfreenect2 (https://github.com/MasWag/libfreenect2/commit/0d78c38c38be35af2b71e063e954203689f1fdbb is required.So don't use master but https://github.com/MasWag/libfreenect2/tree/sequence (branch sequence))
+* libfreenect2 (master is OK now!!)
 * libfreenect2's patched libusb-1.0 (You may already have libusb, but you need to config to be loaded patched libusb.)
 * Powerfull GPU resource
 * USB3.0 port
