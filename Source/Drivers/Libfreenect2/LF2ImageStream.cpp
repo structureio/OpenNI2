@@ -8,7 +8,7 @@ using namespace LF2;
 int
 LF2ImageStream::BuildFrame(libfreenect2::Frame* frame_in,OniFrame* frame_out)
 {
-  frame_out->dataSize = frame_in->width * frame_in->height * sizeof (OniRGB888Pixel);
+  frame_out->dataSize = frame_in->width * frame_in->height * (sizeof (OniRGB888Pixel) +1);
 
   frame_out->data = xnOSMalloc (frame_out->dataSize);
 
