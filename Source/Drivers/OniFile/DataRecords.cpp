@@ -721,7 +721,9 @@ void IntPropRecord::SetValue(XnUInt64 nValue)
 XnUInt64 IntPropRecord::GetValue() const
 {
 	XN_ASSERT(GetPropDataSize() == sizeof(XnUInt64));
-	return *(XnUInt64*)GetPropData();
+	XnUInt64 data;
+	memcpy(&data, GetPropData(), sizeof(XnUInt64));
+	return data;
 }
 
 XnStatus IntPropRecord::AsString(XnChar* strDest, XnUInt32 nSize, XnUInt32& nCharsWritten)
@@ -762,7 +764,9 @@ void RealPropRecord::SetValue(XnDouble dValue)
 XnDouble RealPropRecord::GetValue() const
 {
 	XN_ASSERT(GetPropDataSize() == sizeof(XnDouble));
-	return *(XnDouble*)GetPropData();
+	XnDouble data;
+	memcpy(&data, GetPropData(), sizeof(XnDouble));
+	return data;
 }
 
 XnStatus RealPropRecord::AsString(XnChar* strDest, XnUInt32 nSize, XnUInt32& nCharsWritten)

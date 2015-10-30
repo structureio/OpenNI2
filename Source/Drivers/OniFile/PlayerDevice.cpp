@@ -1006,10 +1006,11 @@ XnStatus XN_CALLBACK_TYPE PlayerDevice::OnNodeGeneralPropChanged(void* pCookie, 
 		}
 		else if (strcmp(strPropName, XN_PROP_FIELD_OF_VIEW) == 0)
 		{
-			XnFieldOfView* pFieldOfView = (XnFieldOfView*)pBuffer;
+			XnFieldOfView pFieldOfView;
+			memcpy(&pFieldOfView, pBuffer, sizeof(XnFieldOfView));
 
 			// Set the HFOV.
-			float fov = (float)pFieldOfView->fHFOV;
+			float fov = (float)pFieldOfView.fHFOV;
 			rc = pSource->SetProperty(ONI_STREAM_PROPERTY_HORIZONTAL_FOV, &fov, sizeof(fov));
 			if (rc != ONI_STATUS_OK)
 			{
@@ -1018,7 +1019,7 @@ XnStatus XN_CALLBACK_TYPE PlayerDevice::OnNodeGeneralPropChanged(void* pCookie, 
 			else
 			{
 				// Set the VFOV.
-				fov = (float)pFieldOfView->fVFOV;
+				fov = (float)pFieldOfView.fVFOV;
 				rc = pSource->SetProperty(ONI_STREAM_PROPERTY_VERTICAL_FOV, &fov, sizeof(fov));
 				if (rc != ONI_STATUS_OK)
 				{
