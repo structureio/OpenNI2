@@ -12,7 +12,8 @@
 #-------------------------------------------------------------------------------
 
 include ThirdParty/PSCommon/BuildSystem/CommonDefs.mak
-
+# Allow warnings during compilation
+export ALLOW_WARNINGS = 1
 #-------------------------------------------------------------------------------
 
 # HAS_JAVA=0 # Uncomment this to force the value.
