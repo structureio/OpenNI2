@@ -115,9 +115,6 @@ class Harvest:
             self.copySharedObject(binDriversDir, 'Kinect', targetDriversDir)
 
     def copySample(self, samplesDir, targetBinDir, name, isLibrary = False, isGL = False, isJava = False, sourceSamplesDir = None):
-        if self.arch == 'Arm' and isGL:
-            return
-
         if sourceSamplesDir is None:
             sourceSamplesDir = os.path.join(self.rootDir, 'Samples')
 
@@ -306,8 +303,6 @@ $(OUTPUT_FILE): copy-redist
             self.copyExecutable(self.binDir, name, targetBinDir)
 
     def copyTool(self, toolsDir, name, isGL = False):
-        if self.arch == 'Arm' and isGL:
-            return
 
         self.copyExecutable(self.binDir, name, toolsDir)
 

@@ -1,0 +1,4 @@
+# some defaults
+export GLUT_SUPPORTED=1
+FLAGS += -O3 -fno-strict-aliasing
+
