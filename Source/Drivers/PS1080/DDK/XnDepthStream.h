@@ -55,7 +55,7 @@ public:
 	inline OniDepthPixel GetDeviceMaxDepth() const { return (OniDepthPixel)m_DeviceMaxDepth.GetValue(); }
 	inline XnUInt32 GetParamCoefficient() const { return (XnUInt32)m_ParamCoefficient.GetValue(); }
 	inline XnUInt32 GetShiftScale() const { return (XnUInt32)m_ShiftScale.GetValue(); }
-	inline OniDepthPixel GetZeroPlaneDistance() const { return (OniDepthPixel)m_ZeroPlaneDistance.GetValue(); }
+	inline XnDouble GetZeroPlaneDistance() const { return m_ZeroPlaneDistance.GetValue(); }
 	inline XnDouble GetZeroPlanePixelSize() const { return m_ZeroPlanePixelSize.GetValue(); }
 	inline XnDouble GetEmitterDCmosDistance() const { return m_EmitterDCmosDistance.GetValue(); }
 	inline XnDouble GetDCmosRCmosDistance() const { return m_GetDCmosRCmosDistance.GetValue(); }
@@ -75,7 +75,7 @@ protected:
 	inline XnActualIntProperty& DeviceMaxDepthProperty() { return m_DeviceMaxDepth; }
 	inline XnActualIntProperty& ParamCoefficientProperty() { return m_ParamCoefficient; }
 	inline XnActualIntProperty& ShiftScaleProperty() { return m_ShiftScale; }
-	inline XnActualIntProperty& ZeroPlaneDistanceProperty() { return m_ZeroPlaneDistance; }
+	inline XnActualRealProperty& ZeroPlaneDistanceProperty() { return m_ZeroPlaneDistance; }
 	inline XnActualRealProperty& ZeroPlanePixelSizeProperty() { return m_ZeroPlanePixelSize; }
 	inline XnActualRealProperty& EmitterDCmosDistanceProperty() { return m_EmitterDCmosDistance; }
 	inline XnActualRealProperty& GetDCmosRCmosDistanceProperty() { return m_GetDCmosRCmosDistance; }
@@ -108,7 +108,7 @@ private:
 	XnActualIntProperty m_DeviceMaxDepth;
 	XnActualIntProperty m_ParamCoefficient;
 	XnActualIntProperty m_ShiftScale;
-	XnActualIntProperty m_ZeroPlaneDistance;
+	XnActualRealProperty m_ZeroPlaneDistance;
 	XnActualRealProperty m_ZeroPlanePixelSize;
 	XnActualRealProperty m_EmitterDCmosDistance;
 	XnActualRealProperty m_GetDCmosRCmosDistance;

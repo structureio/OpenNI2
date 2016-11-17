@@ -89,7 +89,7 @@ XnStatus XnShiftToDepthStreamHelper::InitShiftToDepth()
 		XN_STREAM_PROPERTY_PARAM_COEFF,
 		XN_STREAM_PROPERTY_SHIFT_SCALE,
 		XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,
-		XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,
+		XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,
 		XN_STREAM_PROPERTY_EMITTER_DCMOS_DISTANCE,
 		XN_STREAM_PROPERTY_OUTPUT_FORMAT,
 	};
@@ -149,10 +149,10 @@ XnStatus XnShiftToDepthStreamHelper::GetShiftToDepthConfig(XnShiftToDepthConfig&
 	XnUInt64 nTemp;
 	XnDouble dTemp;
 
-	nRetVal = m_pModule->GetProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE, &nTemp);
+	nRetVal = m_pModule->GetProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE, &dTemp);
 	XN_IS_STATUS_OK(nRetVal);
 
-	Config.nZeroPlaneDistance = (XnUInt16)nTemp;
+	Config.fZeroPlaneDistance = (XnFloat)dTemp;
 
 	nRetVal = m_pModule->GetProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE, &dTemp);
 	XN_IS_STATUS_OK(nRetVal);

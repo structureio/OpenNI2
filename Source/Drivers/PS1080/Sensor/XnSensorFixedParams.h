@@ -49,7 +49,7 @@ public:
 	inline XnUInt16 GetImageCmosI2CBus() const { return m_nSensorImageCMOSI2CBus; }
 	inline XnUInt16 GetImageCmosI2CSlaveAddress() const { return m_nSensorImageCMOSI2CSlaveAddress; }
 
-	inline OniDepthPixel GetZeroPlaneDistance() const { return m_nZeroPlaneDistance; }
+	inline XnDouble GetZeroPlaneDistance() const { return m_dZeroPlaneDistance; }
 	inline XnDouble GetZeroPlanePixelSize() const { return m_dZeroPlanePixelSize; }
 	inline XnDouble GetEmitterDCmosDistance() const { return m_dEmitterDCmosDistance; }
 	inline XnDouble GetDCmosRCmosDistance() const { return m_dDCmosRCmosDistance; }
@@ -71,7 +71,7 @@ private:
 	XnUInt16 m_nSensorImageCMOSI2CBus;
 	XnUInt16 m_nSensorImageCMOSI2CSlaveAddress;
 
-	OniDepthPixel m_nZeroPlaneDistance;
+	XnDouble m_dZeroPlaneDistance;
 	XnDouble m_dZeroPlanePixelSize;
 	XnDouble m_dEmitterDCmosDistance;
 	XnDouble m_dDCmosRCmosDistance;

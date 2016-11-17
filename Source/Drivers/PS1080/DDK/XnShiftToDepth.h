@@ -34,7 +34,7 @@
 typedef struct XnShiftToDepthConfig
 {
 	/** The zero plane distance in depth units. */
-	OniDepthPixel nZeroPlaneDistance;
+	XnFloat fZeroPlaneDistance;
 	/** The zero plane pixel size */
 	XnFloat fZeroPlanePixelSize;
 	/** The distance between the emitter and the Depth Cmos */
