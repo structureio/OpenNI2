@@ -115,12 +115,12 @@ void XnOniDepthStream::notifyAllProperties()
 	getProperty(XN_STREAM_PROPERTY_SHIFT_SCALE, &nValue, &size);
 	raisePropertyChanged(XN_STREAM_PROPERTY_SHIFT_SCALE, &nValue, size);
 
-	// zero plane distance
-	getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE, &nValue, &size);
-	raisePropertyChanged(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE, &nValue, size);
-
 	XnDouble dValue;
 	size = sizeof(dValue);
+
+	// zero plane distance
+	getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE, &dValue, &size);
+	raisePropertyChanged(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE, &dValue, size);
 
 	// zero plane pixel size
 	getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE, &dValue, &size);

@@ -33,7 +33,7 @@ XnSensorFixedParams::XnSensorFixedParams(XnDevicePrivateData* pDevicePrivateData
 	m_nSensorDepthCMOSI2CSlaveAddress(0),
 	m_nSensorImageCMOSI2CBus(0),
 	m_nSensorImageCMOSI2CSlaveAddress(0),
-	m_nZeroPlaneDistance(0),
+	m_dZeroPlaneDistance(0),
 	m_dZeroPlanePixelSize(0),
 	m_dEmitterDCmosDistance(0),
 	m_dDCmosRCmosDistance(0),
@@ -80,7 +80,7 @@ XnStatus XnSensorFixedParams::Init()
 	xnLogVerbose(XN_MASK_DEVICE_SENSOR, "Sensor serial number: %s", m_strSensorSerial);
 
 	// fill in properties
-	m_nZeroPlaneDistance = (OniDepthPixel)FixedParams.fReferenceDistance;
+	m_dZeroPlaneDistance = FixedParams.fReferenceDistance;
 	m_dZeroPlanePixelSize = FixedParams.fReferencePixelSize;
 	m_dEmitterDCmosDistance = FixedParams.fDCmosEmitterDistance;
 	m_dDCmosRCmosDistance = FixedParams.fDCmosRCmosDistance;
