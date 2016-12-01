@@ -32,7 +32,7 @@ import stat
 import UpdateVersion
 
 if len(sys.argv) < 2 or sys.argv[1] in ('-h','--help'):
-    print "usage: " + sys.argv[0] + " <x86|x64|Arm|android> [UpdateVersion]"
+    print("usage: " + sys.argv[0] + " <x86|x64|Arm|android> [UpdateVersion]")
     sys.exit(1)
     
 plat = sys.argv[1]
@@ -89,14 +89,14 @@ def calc_jobs_number():
 
 # Create installer
 strVersion = UpdateVersion.getVersionName()
-print "Creating installer for OpenNI " + strVersion + " " + plat
+print("Creating installer for OpenNI " + strVersion + " " + plat)
 finalDir = "Final"
 if not os.path.isdir(finalDir):
     os.mkdir(finalDir)
     
 if plat == 'android':
     if not 'NDK_ROOT' in os.environ:
-        print 'Please define NDK_ROOT!'
+        print('Please define NDK_ROOT!')
         sys.exit(2)
 
     ndkDir = os.environ['NDK_ROOT']
@@ -115,7 +115,7 @@ if plat == 'android':
     shutil.copy('../Application.mk', buildDir + '/jni')
     rc = subprocess.call([ ndkDir + '/ndk-build', '-C', buildDir, '-j8' ])
     if rc != 0:
-        print 'Build failed!'
+        print('Build failed!')
         sys.exit(3)
 
     finalFile = finalDir + '/' + outputDir + '.tar'
@@ -174,12 +174,12 @@ elif platform.system() == 'Linux' or platform.system() == 'Darwin':
     os.remove(origDir + '/build.release.' + plat + '.log')
     
 else:
-    print "Unknown OS"
+    print("Unknown OS")
     sys.exit(2)
     
 # also copy Release Notes and CHANGES documents
 shutil.copy('../ReleaseNotes.txt', finalDir)
 shutil.copy('../CHANGES.txt', finalDir)
     
-print "Installer can be found under: " + finalDir
-print "Done"
+print("Installer can be found under: " + finalDir)
+print("Done")

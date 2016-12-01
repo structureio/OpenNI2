@@ -58,7 +58,7 @@ def update():
         print ("Illegal build version")
         sys.exit()
 
-    print "Going to update files to version: " + getVersionString()
+    print("Going to update files to version: " + getVersionString())
 
     update_self_defs("./UpdateVersion.py")
     update_src_ver_defs("../Include/OniVersion.h")
