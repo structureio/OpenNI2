@@ -44,7 +44,7 @@ namespace xnl
 	{
 		SingleBuffer* pBuffer = getBuffer();
 
-		if (pBuffer->m_currentEnd > ms_bufferSize)
+		if (pBuffer->m_currentEnd >= ms_bufferSize)
 			return;
 
 		pBuffer->m_errorBuffer[pBuffer->m_currentEnd++] = '\t';
@@ -52,30 +52,41 @@ namespace xnl
 
 		va_list args;
 		va_start(args, cpFormat);
-		xnOSStrFormatV(pBuffer->m_errorBuffer+pBuffer->m_currentEnd, ms_bufferSize-pBuffer->m_currentEnd, &charsWritten, cpFormat, args);
+		XnStatus status = xnOSStrFormatV(pBuffer->m_errorBuffer+pBuffer->m_currentEnd, ms_bufferSize-pBuffer->m_currentEnd, &charsWritten, cpFormat, args);
 		va_end(args);
 
-		pBuffer->m_currentEnd += charsWritten;
-		pBuffer->m_errorBuffer[pBuffer->m_currentEnd++] = '\n';
-		pBuffer->m_errorBuffer[pBuffer->m_currentEnd] = '\0';
-
+		if (status == XN_STATUS_OK)
+		{
+			pBuffer->m_currentEnd += charsWritten;
+			pBuffer->m_errorBuffer[pBuffer->m_currentEnd++] = '\n';
+			pBuffer->m_errorBuffer[pBuffer->m_currentEnd] = '\0';
+		}
+		else
+		{
+			pBuffer->m_currentEnd += charsWritten;
+		}
 	}
 
 	void ErrorLogger::AppendV(const XnChar* cpFormat, va_list args)
 	{
 		SingleBuffer* pBuffer = getBuffer();
 
-		if (pBuffer->m_currentEnd > ms_bufferSize)
+		if (pBuffer->m_currentEnd >= ms_bufferSize)
 			return;
+
 		pBuffer->m_errorBuffer[pBuffer->m_currentEnd++] = '\t';
 		unsigned int charsWritten;
 
-		xnOSStrFormatV(pBuffer->m_errorBuffer+pBuffer->m_currentEnd, ms_bufferSize-pBuffer->m_currentEnd, &charsWritten, cpFormat, args);
-
-		pBuffer->m_currentEnd += charsWritten;
-		pBuffer->m_errorBuffer[pBuffer->m_currentEnd++] = '\n';
-		pBuffer->m_errorBuffer[pBuffer->m_currentEnd] = '\0';
-
+		if (xnOSStrFormatV(pBuffer->m_errorBuffer + pBuffer->m_currentEnd, ms_bufferSize - pBuffer->m_currentEnd, &charsWritten, cpFormat, args) == XN_STATUS_OK)
+		{
+			pBuffer->m_currentEnd += charsWritten;
+			pBuffer->m_errorBuffer[pBuffer->m_currentEnd++] = '\n';
+			pBuffer->m_errorBuffer[pBuffer->m_currentEnd] = '\0';
+		}
+		else
+		{
+			pBuffer->m_currentEnd += charsWritten;
+		}
 	}
 
 	ErrorLogger::ErrorLogger()
