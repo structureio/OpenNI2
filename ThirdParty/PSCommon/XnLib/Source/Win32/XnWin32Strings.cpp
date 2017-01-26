@@ -252,9 +252,11 @@ XN_C_API XnStatus xnOSStrFormatV(XnChar* cpDestString, const XnUInt32 nDestLengt
 
 	// nRes is the number of bytes written, not including NULL termination
 
-	if ((nRes == -1) ||	// string was truncated
-		(nRes == (XnInt32)nDestLength && cpDestString[nRes] != '\0')) // no space for the NULL termination
+	if ( nRes < 0 // encoding error 
+	  || nRes > (XnInt32)nDestLength // string was truncated
+	  || (nRes == (XnInt32)nDestLength && cpDestString[nRes] != '\0')) // no space for the NULL termination
 	{
+    *pnCharsWritten = nDestLength;
 		return (XN_STATUS_INTERNAL_BUFFER_TOO_SMALL);
 	}
 
