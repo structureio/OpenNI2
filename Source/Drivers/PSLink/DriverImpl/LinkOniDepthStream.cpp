@@ -233,7 +233,7 @@ XnStatus LinkOniDepthStream::GetDefaultVideoMode( OniVideoMode* pVideoMode )
 	if(pVideoMode != NULL)
 	{
 		//ARM cannot handle QVGA, so we default to QQVGA
-#if (XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
+#if (XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_ANDROID_ARM || XN_PLATFORM == XN_PLATFORM_LINUX_AARCH64)
 		pVideoMode->resolutionX = 160;
 		pVideoMode->resolutionY = 120;
 #else

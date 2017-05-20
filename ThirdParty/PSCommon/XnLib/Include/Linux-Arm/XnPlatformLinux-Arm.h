@@ -29,8 +29,13 @@
 //---------------------------------------------------------------------------
 #undef XN_PLATFORM
 #undef XN_PLATFORM_STRING
+#ifdef __aarch64__
+#define XN_PLATFORM XN_PLATFORM_LINUX_AARCH64
+#define XN_PLATFORM_STRING "Linux-AArch64"
+#else
 #define XN_PLATFORM XN_PLATFORM_LINUX_ARM
 #define XN_PLATFORM_STRING "Linux-Arm"
+#endif
 
 #endif //_XN_PLATFORM_LINUX_ARM_H_
 

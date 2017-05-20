@@ -23,7 +23,7 @@
 //---------------------------------------------------------------------------
 #include <XnPlatform.h>
 
-#if (XN_PLATFORM == XN_PLATFORM_LINUX_ARM)
+#if (XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_LINUX_AARCH64)
 
 #include <XnUSBDevice.h>
 #include <linux/usb/gadgetfs.h>
@@ -1148,4 +1148,4 @@ XN_C_API XnStatus XN_C_DECL xnUSBDeviceResetEndpoint(XnUSBDevice* pDevice, XnUIn
 	return XN_STATUS_OK;
 }
 
-#endif // XN_PLATFORM == XN_PLATFORM_LINUX_ARM
+#endif // XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_LINUX_AARCH64

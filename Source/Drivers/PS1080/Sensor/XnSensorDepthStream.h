@@ -32,7 +32,7 @@
 //---------------------------------------------------------------------------
 // Defines
 //---------------------------------------------------------------------------
-#if (XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
+#if (XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_ANDROID_ARM || XN_PLATFORM == XN_PLATFORM_LINUX_AARCH64)
 	#define XN_DEPTH_STREAM_DEFAULT_INPUT_FORMAT				XN_IO_DEPTH_FORMAT_UNCOMPRESSED_12_BIT
 	#define XN_DEPTH_STREAM_DEFAULT_RESOLUTION					XN_RESOLUTION_QQVGA
 #else

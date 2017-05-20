@@ -29,8 +29,13 @@
 //---------------------------------------------------------------------------
 #undef ONI_PLATFORM
 #undef ONI_PLATFORM_STRING
-#define ONI_PLATFORM ONI_PLATFORM_LINUX_ARM
-#define ONI_PLATFORM_STRING "Linux-Arm"
+#ifdef __aarch64__
+#	define ONI_PLATFORM ONI_PLATFORM_LINUX_AARCH64
+#	define ONI_PLATFORM_STRING "Linux-AArch64"
+#else
+#	define ONI_PLATFORM ONI_PLATFORM_LINUX_ARM
+#	define ONI_PLATFORM_STRING "Linux-Arm"
+#endif
 
 #endif // ONIPLATFORMLINUX_ARM_H
 
