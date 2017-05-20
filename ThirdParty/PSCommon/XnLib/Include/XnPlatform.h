@@ -31,6 +31,7 @@
 #define XN_PLATFORM_LINUX_ARM 7
 #define XN_PLATFORM_MACOSX 8
 #define XN_PLATFORM_ANDROID_ARM 9
+#define XN_PLATFORM_LINUX_AARCH64 10
 
 #define XN_PLATFORM_IS_LITTLE_ENDIAN 1
 #define XN_PLATFORM_IS_BIG_ENDIAN    2
@@ -51,7 +52,7 @@
 #include "Android-Arm/XnPlatformAndroid-Arm.h"
 #elif (__linux__ && (i386 || __x86_64__))
 #include "Linux-x86/XnPlatformLinux-x86.h"
-#elif (__linux__ && __arm__)
+#elif (__linux__ && (__arm__ || __aarch64__))
 #include "Linux-Arm/XnPlatformLinux-Arm.h"
 #elif _ARC
 #include "ARC/XnPlaformARC.h"

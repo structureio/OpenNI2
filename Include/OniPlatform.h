@@ -27,6 +27,7 @@
 #define ONI_PLATFORM_LINUX_ARM 3
 #define ONI_PLATFORM_MACOSX 4
 #define ONI_PLATFORM_ANDROID_ARM 5
+#define ONI_PLATFORM_LINUX_AARCH64 6
 
 #if (defined _WIN32)
 #	ifndef RC_INVOKED
@@ -39,7 +40,7 @@
 #	include "Android-Arm/OniPlatformAndroid-Arm.h"
 #elif (__linux__ && (i386 || __x86_64__))
 #	include "Linux-x86/OniPlatformLinux-x86.h"
-#elif (__linux__ && __arm__)
+#elif (__linux__ && (__arm__ || __aarch64__))
 #	include "Linux-Arm/OniPlatformLinux-Arm.h"
 #elif _ARC
 #	include "ARC/OniPlaformARC.h"

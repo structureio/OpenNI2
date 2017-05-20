@@ -47,7 +47,7 @@
 	#define USB_DT_DEVICE_SIZE 0
 	#define USB_DT_DEVICE 0
 
-#elif (XN_PLATFORM == XN_PLATFORM_LINUX_X86 || XN_PLATFORM == XN_PLATFORM_LINUX_ARM)
+#elif (XN_PLATFORM == XN_PLATFORM_LINUX_X86 || XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_LINUX_AARCH64)
 	#include <linux/usb/ch9.h>
 	typedef struct usb_endpoint_descriptor XnUSBEndpointDescriptor;
 	typedef struct usb_interface_descriptor XnUSBInterfaceDescriptor;
