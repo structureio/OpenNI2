@@ -4,7 +4,7 @@ http://structure.io/openni
 
 ## Develop branch ##
 
-The latest ongoing development is currently being done in the develop branch.  Refer to README and ReleasesNotes in the develop branch for up to date build instructions.
+The latest ongoing development is currently being done in the develop branch.  Refer to README and [ReleasesNotes](https://github.com/occipital/OpenNI2/blob/master/ReleaseNotes.txt) in the develop branch for up to date build instructions.
 
 ## Contributing ##
 
@@ -26,7 +26,7 @@ Other than that, sensible and meaningful contributions are very welcome!
 
 - Python 2.6+/3.x
 
-    - Download and install from: http://www.python.org/download/
+    - Download and install from: https://www.python.org/download/
 
 - PyWin32
 
