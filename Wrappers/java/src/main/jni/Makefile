@@ -1,18 +1,20 @@
-include ../../../ThirdParty/PSCommon/BuildSystem/CommonDefs.mak
+SDK_PATH := ../../../../..
 
-BIN_DIR = ../../../Bin
+include $(SDK_PATH)/ThirdParty/PSCommon/BuildSystem/CommonDefs.mak
+
+BIN_DIR = $(SDK_PATH)/Bin
 
 INC_DIRS = \
-	. \
-	../../../Include \
-	../../../ThirdParty/PSCommon/XnLib/Include
+  . \
+  $(SDK_PATH)/Include \
+  $(SDK_PATH)/ThirdParty/PSCommon/XnLib/Include
 
 SRC_FILES = *.cpp
 
-USED_LIBS += OpenNI2 
+USED_LIBS += OpenNI2
 
 LIB_NAME = OpenNI2.jni
 
 CFLAGS += -Wall
 
-include ../../../ThirdParty/PSCommon/BuildSystem/CommonCppMakefile
+include $(SDK_PATH)/ThirdParty/PSCommon/BuildSystem/CommonCppMakefile
