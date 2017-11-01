@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 14
+    compileSdkVersion 21
     buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "org.openni.android.samples.simpleviewer"
-        minSdkVersion 14
-        targetSdkVersion 18
+        minSdkVersion 21
+        targetSdkVersion 21
     }
 
     buildTypes {
