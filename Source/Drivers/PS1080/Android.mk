@@ -1,4 +1,4 @@
-# OpenNI 2.x Android makefile. 
+# OpenNI 2.x Android makefile.
 # Copyright (C) 2012 PrimeSense Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,7 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License. 
+# limitations under the License.
 
 LOCAL_PATH := $(call my-dir)
 
@@ -41,7 +41,15 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../../DepthUtils \
 	$(LOCAL_PATH)/../../../Include \
 
-# Dependencies	
+ifdef USB_LIB_PATH
+#get lib_usb
+include $(CLEAR_VARS)
+LOCAL_MODULE           := usb
+LOCAL_SRC_FILES        := $(USB_LIB_PATH)
+include $(PREBUILT_SHARED_LIBRARY)
+endif
+
+# Dependencies
 LOCAL_STATIC_LIBRARIES := XnLib DepthUtils
 LOCAL_SHARED_LIBRARIES := libusb
 
