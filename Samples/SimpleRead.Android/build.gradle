@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "org.openni.android.samples.simpleread"
@@ -19,5 +18,5 @@ android {
 }
 
 dependencies {
-    compile project(':openniJNI')
+    implementation project(':openniJNI')
 }
