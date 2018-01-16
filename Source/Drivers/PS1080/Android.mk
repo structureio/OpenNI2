@@ -15,6 +15,15 @@
 
 LOCAL_PATH := $(call my-dir)
 
+
+ifdef USB_LIB_PATH
+#get lib_usb
+include $(CLEAR_VARS)
+LOCAL_MODULE           := usb
+LOCAL_SRC_FILES        := $(USB_LIB_PATH)
+include $(PREBUILT_SHARED_LIBRARY)
+endif
+
 include $(CLEAR_VARS)
 
 include $(LOCAL_PATH)/../../../ThirdParty/PSCommon/BuildSystem/CommonAndroid.mk
@@ -40,14 +49,6 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/Include \
 	$(LOCAL_PATH)/../../DepthUtils \
 	$(LOCAL_PATH)/../../../Include \
-
-ifdef USB_LIB_PATH
-#get lib_usb
-include $(CLEAR_VARS)
-LOCAL_MODULE           := usb
-LOCAL_SRC_FILES        := $(USB_LIB_PATH)
-include $(PREBUILT_SHARED_LIBRARY)
-endif
 
 # Dependencies
 LOCAL_STATIC_LIBRARIES := XnLib DepthUtils
