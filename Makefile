@@ -1,5 +1,5 @@
 # OpenNI 2 Makefile
-# 
+#
 # Default configuration is Release. for a debug version use:
 # 	make CFG=Debug
 #
@@ -54,17 +54,18 @@ CXX_SAMPLES_SUBDIRS = \
 	Samples/EventBasedRead \
 	Samples/MultipleStreamRead \
 	Samples/MWClosestPoint \
-	Samples/MWClosestPointApp 
+	Samples/MWClosestPointApp
 
 #-------------------------------------------------------------------------------
 # Java
 
 JAVA_MAIN_SUBDIRS = \
-	Wrappers/java \
-	Wrappers/java/jni
+	Wrappers/java/ \
+	Wrappers/java/src/main/jni
+	# Wrappers/java/src/main/java \
 
 JAVA_SAMPLES_SUBDIRS = \
-	Samples/SimpleViewer.java	
+	Samples/SimpleViewer.java
 
 #-------------------------------------------------------------------------------
 # GLUT
@@ -115,10 +116,10 @@ CLEAN_SUBDIRS = $(foreach target,$(ALL_SUBDIRS),$(target)-clean)
 
 # Define a function for creating per-subdirectory target rules.
 define CREATE_SUBDIR
-$1: 
+$1:
 	$$(MAKE) -C $1
 
-$1-clean: 
+$1-clean:
 	$$(MAKE) -C $1 clean
 endef
 
@@ -145,8 +146,8 @@ $(FINAL_DIR):
 
 $(CORE): $(XNLIB)
 
-Wrappers/java:                        Wrappers/java/jni
-Wrappers/java/jni:                    $(CORE)
+Wrappers/java:                        Wrappers/java/src/main/jni
+Wrappers/java/src/main/jni:           $(CORE)
 
 Source/Drivers/DummyDevice:           $(CORE)
 Source/Drivers/RawDevice:             $(CORE)
@@ -168,7 +169,7 @@ Samples/MultiDepthViewer:             $(CORE)
 Samples/MWClosestPointApp:            $(CORE) Samples/MWClosestPoint
 Samples/ClosestPointViewer:           $(CORE) Samples/MWClosestPoint
 
-Samples/SimpleViewer.java:            Wrappers/java
+Samples/SimpleViewer.java:            Wrappers/java/src/main/java
 
 #-------------------------------------------------------------------------------
 # Top-level targets

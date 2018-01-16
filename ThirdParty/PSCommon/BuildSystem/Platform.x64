@@ -1,5 +1,31 @@
 # take this file's dir
 COMMON_MAK_DIR = $(dir $(lastword $(MAKEFILE_LIST)))
 
-# everything is the same as in x86
-include $(COMMON_MAK_DIR)Platform.x86
+# some defaults
+export GLUT_SUPPORTED=1
+
+ifndef SSE_GENERATION
+  SSE_GENERATION = 3
+endif
+
+ifeq ("$(OSTYPE)","Darwin")
+  # NOTE: this is not building universal any more since libusb.dylib is
+  # only x86_64 these days
+  # Making the binary a x64 only
+  CFLAGS  += -arch x86_64
+  LDFLAGS += -arch x86_64
+endif
+
+
+ifeq ($(SSE_GENERATION), 2)
+  CFLAGS += -msse2
+else
+  ifeq ($(SSE_GENERATION), 3)
+    CFLAGS += -msse3
+    ifeq ($(SSSE3_ENABLED), 1)
+      CFLAGS += -mssse3
+    endif
+  else
+    DUMMY:=($error "Only SSE2 and SSE3 are supported")
+  endif
+endif

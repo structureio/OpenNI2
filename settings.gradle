@@ -1,0 +1,5 @@
+include ':openniJNI', ':SimpleRead', ':SimpleViewer'
+
+project(':openniJNI').projectDir = new File(rootProject.projectDir,"Wrappers/java")
+project(':SimpleRead').projectDir = new File(rootProject.projectDir,"Samples/SimpleRead.Android")
+project(':SimpleViewer').projectDir = new File(rootProject.projectDir,"Samples/SimpleViewer.Android")

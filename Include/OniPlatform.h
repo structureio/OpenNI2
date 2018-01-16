@@ -35,7 +35,8 @@
 #		endif
 #	endif
 #	include "Win32/OniPlatformWin32.h"
-#elif defined (ANDROID) && defined (__arm__)
+// NOTE: __arm__ isn't defined on arm64-v7a but we restrict the APP_ABI in other places
+#elif defined (ANDROID) //&& defined (__arm__)
 #	include "Android-Arm/OniPlatformAndroid-Arm.h"
 #elif (__linux__ && (i386 || __x86_64__))
 #	include "Linux-x86/OniPlatformLinux-x86.h"
