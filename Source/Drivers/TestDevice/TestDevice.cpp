@@ -18,7 +18,7 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#include "Driver\OniDriverAPI.h"
+#include "Driver/OniDriverAPI.h"
 #include "XnLib.h"
 #include "XnHash.h"
 #include "XnEvent.h"
