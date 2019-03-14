@@ -1,7 +1,7 @@
 #ifndef _KINECT_DRIVER_H_
 #define _KINECT_DRIVER_H_
 
-#include "Driver\OniDriverAPI.h"
+#include "Driver/OniDriverAPI.h"
 #include "XnHash.h"
 #include <Shlobj.h>
 #include "NuiApi.h"
