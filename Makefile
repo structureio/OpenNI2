@@ -37,7 +37,8 @@ ALL_DRIVERS = \
 	Source/Drivers/DummyDevice   \
 	Source/Drivers/PS1080 \
 	Source/Drivers/PSLink \
-	Source/Drivers/OniFile
+	Source/Drivers/OniFile \
+	Source/Drivers/Libfreenect2
 
 # list all wrappers
 ALL_WRAPPERS = \
@@ -48,7 +49,7 @@ ALL_WRAPPERS = \
 ALL_TOOLS = \
 	Source/Drivers/PS1080/PS1080Console \
 	Source/Drivers/PSLink/PSLinkConsole
-	
+
 # list all core projects
 ALL_CORE_PROJS = \
 	$(XNLIB)  \
@@ -152,7 +153,7 @@ $(FINAL_DIR):
 doc:
 	Source/Documentation/Runme.py
 	rm -f Source/Documentation/html/*.md5
-	
+
 release: | all doc $(FINAL_DIR)
 	Packaging/Harvest.py Packaging/$(PRODUCT_STRING) $(PLATFORM)
 	cd Packaging; tar -cjf Final/$(PRODUCT_STRING).tar.bz2 $(PRODUCT_STRING)
