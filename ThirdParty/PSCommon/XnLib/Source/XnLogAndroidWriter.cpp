@@ -58,7 +58,7 @@ void XnLogAndroidWriter::WriteEntry(const XnLogEntry* pEntry)
 #ifdef XN_PLATFORM_ANDROID_OS
 	ALOGE("OpenNI2: %s\n", pEntry->strMessage);
 #else
-	__android_log_print(OpenNISeverityToAndroid(pEntry->nSeverity), "OpenNI", pEntry->strMessage);
+	__android_log_print(OpenNISeverityToAndroid(pEntry->nSeverity), "OpenNI", "%s", pEntry->strMessage);
 #endif
 }
 
