@@ -307,7 +307,7 @@ JNIEXPORT jobject JNICALL Java_org_openni_NativeMethods_oniStreamGetSensorInfo
 		  jobject videoModeObj = env->NewObject(videoModeCls, videoModeCtor, videoMode.resolutionX, 
 			  videoMode.resolutionY,  videoMode.fps, (int)videoMode.pixelFormat);
 
-		  (*env).CallVoidMethod(vectorObj, (*env).GetMethodID(arrayListCls, "add", "(Ljava/lang/Object;)Z"), videoModeObj);
+		  (*env).CallBooleanMethod(vectorObj, (*env).GetMethodID(arrayListCls, "add", "(Ljava/lang/Object;)Z"), videoModeObj);
 		  i++;			
 	  }
 	  jclass sensorInfoCls = (*env).FindClass("org/openni/SensorInfo");
@@ -403,7 +403,7 @@ JNIEXPORT jobject JNICALL Java_org_openni_NativeMethods_oniDeviceGetSensorInfo
 		  jobject videoModeObj = env->NewObject(videoModeCls, videoModeCtor, videoMode.resolutionX, 
 			  videoMode.resolutionY,  videoMode.fps, (int)videoMode.pixelFormat);
 
-		  (*env).CallVoidMethod(vectorObj, (*env).GetMethodID(arrayListCls, "add", "(Ljava/lang/Object;)Z"), videoModeObj);
+		  (*env).CallBooleanMethod(vectorObj, (*env).GetMethodID(arrayListCls, "add", "(Ljava/lang/Object;)Z"), videoModeObj);
 		  i++;			
 	  }
 	  jclass sensorInfoCls = (*env).FindClass("org/openni/SensorInfo");
@@ -659,7 +659,7 @@ JNIEXPORT jint JNICALL Java_org_openni_NativeMethods_oniGetDeviceList
 				  uriObj, vendorObj, nameObj, m_pDeviceInfos[i].usbVendorId, m_pDeviceInfos[i].usbProductId);
 			  jclass vectorCls = (*env).FindClass("java/util/List");
 			  jmethodID methodId = (*env).GetMethodID(vectorCls, "add", "(Ljava/lang/Object;)Z");
-			  (*env).CallVoidMethod(deviceListObj, methodId, deviceInfObj);
+			  (*env).CallBooleanMethod(deviceListObj, methodId, deviceInfObj);
 
 		  }
 	  }	  
