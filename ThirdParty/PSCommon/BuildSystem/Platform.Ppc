@@ -1,0 +1,2 @@
+# some defaults
+export GLUT_SUPPORTED=1

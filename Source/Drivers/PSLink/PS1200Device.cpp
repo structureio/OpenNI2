@@ -43,7 +43,7 @@ XnStatus PS1200Device::Init(const XnChar* strConnString, XnTransportType transpo
 	// On all platforms other than Windows, prefer BULK
 	nRetVal = SetUsbAltInterface(0);
 	XN_IS_STATUS_OK_LOG_ERROR("Switch to ISO", nRetVal);
-#elif (XN_PLATFORM == XN_PLATFORM_LINUX_X86 || XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_MACOSX || XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
+#elif (XN_PLATFORM == XN_PLATFORM_LINUX_X86 || XN_PLATFORM == XN_PLATFORM_LINUX_ARM || XN_PLATFORM == XN_PLATFORM_LINUX_AARCH64 || XN_PLATFORM == XN_PLATFORM_LINUX_PPC || XN_PLATFORM == XN_PLATFORM_MACOSX || XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
 	// On all platforms other than Windows, prefer BULK
 	nRetVal = SetUsbAltInterface(1);
 	XN_IS_STATUS_OK_LOG_ERROR("Switch to BULK", nRetVal);
