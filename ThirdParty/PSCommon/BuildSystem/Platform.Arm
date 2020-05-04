@@ -1,7 +1,7 @@
 ifeq "$(CFG)" "Release"
 
     # Hardware specifying flags
-    CFLAGS += -march=armv7-a -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp #-mcpu=cortex-a8
+    CFLAGS += -march=armv7-a -mtune=cortex-a9 -mfpu=neon -mfloat-abi=hard #-mcpu=cortex-a8
 
     # Optimization level, minus currently buggy optimizing methods (which break bit-exact)
     CFLAGS += -O3 -fno-tree-pre -fno-strict-aliasing
