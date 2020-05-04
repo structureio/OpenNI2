@@ -54,7 +54,7 @@ class Harvest:
         elif self.osName == 'Darwin':
             shutil.copy(os.path.join(sourceDir, 'lib' + name + '.dylib'), targetDir)
         else:
-            raise 'Unsupported platform!'
+            raise Execption('Unsupported platform!')
             
     def copyExecutable(self, sourceDir, name, targetDir):
         if self.osName == 'Windows':
