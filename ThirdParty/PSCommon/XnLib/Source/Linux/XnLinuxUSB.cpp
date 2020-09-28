@@ -585,6 +585,12 @@ XN_C_API XnStatus xnUSBEnumerateDevices(XnUInt16 nVendorID, XnUInt16 nProductID,
 	libusb_device** ppDevices;
 	ssize_t nDeviceCount = libusb_get_device_list(g_InitData.pContext, &ppDevices);
 	
+	// check for error
+	if (nDeviceCount < 0)
+	{
+		return (XN_STATUS_USB_ENUMERATE_FAILED);
+	}
+
 	// first enumeration - count
 	XnUInt32 nCount = 0;
 	
@@ -763,6 +769,12 @@ XN_C_API XnStatus xnUSBOpenDeviceByPath(const XnUSBConnectionString strDevicePat
 	libusb_device** ppDevices;
 	ssize_t nDeviceCount = libusb_get_device_list(g_InitData.pContext, &ppDevices);
 	
+	// check for error
+	if (nDeviceCount < 0)
+	{
+		return (XN_STATUS_USB_ENUMERATE_FAILED);
+	}
+
 	libusb_device* pRequestedDevice = NULL;
 	
 	for (ssize_t i = 0; i < nDeviceCount; ++i)
