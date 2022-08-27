@@ -670,6 +670,7 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 	{
 		if (pStreams[i] == NULL)
 		{
+            streamsList[i] = NULL;
 			continue;
 		}
 
@@ -744,6 +745,7 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 	} while (XN_STATUS_OK == xnOSWaitEvent(hEvent, timeToWait));
 	
 	xnOSStopTimer(&workTimer);
+	releaseThreadEvent();
 
 	if (oldestIndex != -1)
 	{
@@ -1049,15 +1051,31 @@ XN_EVENT_HANDLE Context::getThreadEvent()
 
 	m_cs.Lock();
 	
-	if (XN_STATUS_OK != m_waitingThreads.Get(tid, hEvent))
+	if (XN_STATUS_OK != m_knownThreads.Get(tid, hEvent))
 	{
 		xnOSCreateEvent(&hEvent, FALSE);
-		m_waitingThreads.Set(tid, hEvent);
+		m_knownThreads.Set(tid, hEvent);
 	}
+	m_waitingThreads.Set(tid, hEvent);
 
 	m_cs.Unlock();
 
 	return hEvent;
+}
+
+void Context::releaseThreadEvent()
+{
+	XN_THREAD_ID tid;
+	xnOSGetCurrentThreadID(&tid);
+
+	m_cs.Lock();
+	auto pEntry = m_waitingThreads.Find(tid);
+	if (m_waitingThreads.End() != pEntry)
+	{
+		m_waitingThreads.Remove(pEntry);
+	}
+
+	m_cs.Unlock();
 }
 
 ONI_NAMESPACE_IMPLEMENTATION_END

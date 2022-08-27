@@ -115,6 +115,7 @@ private:
 	XnStatus loadLibraries(const char* directoryName);
 	void onNewFrame();
 	XN_EVENT_HANDLE getThreadEvent();
+	void releaseThreadEvent();
 	static void XN_CALLBACK_TYPE newFrameCallback(void* pCookie);
 
 	FrameManager m_frameManager;
@@ -131,6 +132,7 @@ private:
     xnl::List<oni::implementation::Recorder*> m_recorders;
 
 	xnl::Hash<XN_THREAD_ID, XN_EVENT_HANDLE> m_waitingThreads;
+	xnl::Hash<XN_THREAD_ID, XN_EVENT_HANDLE> m_knownThreads;
 
 	xnl::CriticalSection m_cs;
 
