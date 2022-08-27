@@ -30,8 +30,8 @@
 struct XnCallback
 {
 	XnCallback() : pFuncPtr(NULL), pCookie(NULL) {}
-	XnCallback(XnFuncPtr pFuncPtr, void* pCookie) : pFuncPtr(pFuncPtr), pCookie(pCookie) {}
-	void Set(XnFuncPtr pFuncPtr, void* pCookie) { this->pFuncPtr = pFuncPtr; this->pCookie = pCookie; }
+	XnCallback(XnFuncPtr _pFuncPtr, void* _pCookie) : pFuncPtr(_pFuncPtr), pCookie(_pCookie) {}
+	void Set(XnFuncPtr _pFuncPtr, void* _pCookie) { this->pFuncPtr = _pFuncPtr; this->pCookie = _pCookie; }
 
 	XnFuncPtr pFuncPtr;
 	void* pCookie;

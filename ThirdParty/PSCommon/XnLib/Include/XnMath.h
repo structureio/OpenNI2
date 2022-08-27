@@ -35,7 +35,7 @@ namespace xnl
 		}
 		inline XnFloat Abs(XnFloat f)
 		{
-			return fabs(f);
+			return (XnFloat)fabs(f);
 		}
 		template <class T>
 		XnBool IsZero(T value, T tolerance)
@@ -48,11 +48,11 @@ namespace xnl
 		}
 		inline XnFloat Sqrt(XnFloat f)
 		{
-			return sqrt(f);
+			return (XnFloat)sqrt(f);
 		}
 		inline XnDouble Sqrt(XnDouble f)
 		{
-			return sqrt(f);
+			return (XnFloat)sqrt(f);
 		}
 		template <class T>
 		T Min(T value1, T value2)

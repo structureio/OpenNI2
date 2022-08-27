@@ -275,9 +275,9 @@ openni::Status openDeviceFromList(DeviceConfig config)
 	{
 		printf("Choose device to open (1) [0 to exit]: ");
 
-		int rc = scanf("%d", &chosen);
+		int rc2 = scanf("%p", (void**)&chosen);
 
-		if (rc <= 0 || chosen == 0)
+		if (rc2 <= 0 || chosen == 0)
 		{
 			return openni::STATUS_ERROR;
 		}

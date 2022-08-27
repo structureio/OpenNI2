@@ -586,11 +586,11 @@ typedef enum XnPixelFormat
 
 typedef struct XnSupportedPixelFormats
 {
-    XnBool m_bRGB24 : 1;
-    XnBool m_bYUV422 : 1;
-    XnBool m_bGrayscale8Bit : 1;
-    XnBool m_bGrayscale16Bit : 1;
-    XnBool m_bMJPEG : 1;
+    XnUInt m_bRGB24 : 1;
+    XnUInt m_bYUV422 : 1;
+    XnUInt m_bGrayscale8Bit : 1;
+    XnUInt m_bGrayscale16Bit : 1;
+    XnUInt m_bMJPEG : 1;
     XnUInt m_nPadding : 3;
     XnUInt m_nReserved : 24;
 } XnSupportedPixelFormats;

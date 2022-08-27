@@ -61,7 +61,7 @@ public:
 		{
 			if (*pDataSize != sizeof(OniVideoMode))
 			{
-				printf("Unexpected size: %d != %d\n", *pDataSize, sizeof(OniVideoMode));
+				printf("Unexpected size: %d != %d\n", *pDataSize, int(sizeof(OniVideoMode)));
 				return ONI_STATUS_ERROR;
 			}
 			return GetVideoMode((OniVideoMode*)data);
@@ -76,7 +76,7 @@ public:
 		{
 			if (dataSize != sizeof(OniVideoMode))
 			{
-				printf("Unexpected size: %d != %d\n", dataSize, sizeof(OniVideoMode));
+				printf("Unexpected size: %d != %d\n", dataSize, int(sizeof(OniVideoMode)));
 				return ONI_STATUS_ERROR;
 			}
 			return SetVideoMode((OniVideoMode*)data);
@@ -85,7 +85,7 @@ public:
 		{
 			if (dataSize != sizeof(int))
 			{
-				printf("Unexpected size: %d != %d\n", dataSize, sizeof(int));
+				printf("Unexpected size: %d != %d\n", dataSize, int(sizeof(int)));
 				return ONI_STATUS_ERROR;
 			}
 

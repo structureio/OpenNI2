@@ -171,7 +171,7 @@ XnFloat &Vector3D::operator[](XnUInt32 index)
 
 Vector3D& Vector3D::Set(const Vector3D& other) {*this = other; return *this;}
 Vector3D& Vector3D::Set(const Point3D& point) {*this = point; return *this;}
-Vector3D& Vector3D::Set(XnFloat x, XnFloat y, XnFloat z) {this->x = x; this->y = y; this->z = z; return *this;}
+Vector3D& Vector3D::Set(XnFloat _x, XnFloat _y, XnFloat _z) {this->x = _x; this->y = _y; this->z = _z; return *this;}
 
 Vector3D& Vector3D::SetZero() {return Set(Zero());}
 XnBool Vector3D::IsZero() const {return *this==Zero();}

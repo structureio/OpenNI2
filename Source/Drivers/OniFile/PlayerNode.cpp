@@ -394,7 +394,6 @@ XnStatus PlayerNode::SeekToFrameAbsolute(XnUInt32 nNodeID, XnUInt32 nDestFrame)
 		// perform old seek (no data indexes)
 		XnUInt64 nStartPos = TellStream();
 		XnUInt32 nNextFrame = pPlayerNodeInfo->nCurFrame + 1;
-		XnStatus nRetVal = XN_STATUS_OK;
 
 		if (nDestFrame < nNextFrame)
 		{
@@ -1700,8 +1699,8 @@ XnStatus PlayerNode::SeekToTimeStampAbsolute(XnUInt64 nDestTimeStamp)
 				//Read rest of record and handle it normally
 				nRetVal = Read(m_pRecordBuffer + record.HEADER_SIZE, record.GetSize() - record.HEADER_SIZE, nBytesRead);
 				XN_IS_STATUS_OK(nRetVal);
-				Record record(m_pRecordBuffer, RECORD_MAX_SIZE, m_bIs32bitFileFormat);
-				nRetVal = HandleRecord(record, TRUE);
+				Record record2(m_pRecordBuffer, RECORD_MAX_SIZE, m_bIs32bitFileFormat);
+				nRetVal = HandleRecord(record2, TRUE);
 				XN_IS_STATUS_OK(nRetVal);
 				break;
 			}

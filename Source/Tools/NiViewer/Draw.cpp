@@ -1286,7 +1286,6 @@ void drawPointerMode(IntPair* pPointer)
 			glEnd();
 
 			// place a label under, and in the middle of, that line.
-			XnUInt32 chars;
 			xnOSStrFormat(buf, sizeof(buf), &chars, "%d", i);
 			glColor3f(1,0,0);
 			glRasterPos2i(xPos - chars*nCharWidth/2, WIN_SIZE_Y - 40);

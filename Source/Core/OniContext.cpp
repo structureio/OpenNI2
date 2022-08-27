@@ -420,11 +420,11 @@ OniStatus Context::deviceOpen(const char* uri, const char* mode, OniDeviceHandle
 		{
 			if ((*iter)->tryDevice(deviceURI))
 			{
-				for (xnl::List<Device*>::Iterator iter = m_devices.Begin(); iter != m_devices.End(); ++iter)
+				for (xnl::List<Device*>::Iterator devIter = m_devices.Begin(); devIter != m_devices.End(); ++devIter)
 				{
-					if (xnOSStrCmp((*iter)->getInfo()->uri, deviceURI) == 0)
+					if (xnOSStrCmp((*devIter)->getInfo()->uri, deviceURI) == 0)
 					{
-						pMyDevice = *iter;
+						pMyDevice = *devIter;
 						break;
 					}
 				}
