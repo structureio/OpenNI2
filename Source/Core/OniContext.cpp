@@ -741,7 +741,10 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 				timeToWait = timeout - (int)passedTime;
 			else
 				timeToWait = 0;
+			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait %d for event %lx", timeToWait, (XnUInt32)hEvent);
 		}
+		else
+			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait for event %lx", (XnUInt32)hEvent);
 	} while (XN_STATUS_OK == xnOSWaitEvent(hEvent, timeToWait));
 	
 	xnOSStopTimer(&workTimer);
@@ -749,9 +752,11 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 
 	if (oldestIndex != -1)
 	{
+		xnLogVerbose(XN_MASK_ONI_CONTEXT, "Stream index %d", oldestIndex);
 		return ONI_STATUS_OK;
 	}
 
+	xnLogVerbose(XN_MASK_ONI_CONTEXT, "Timeout");
 	m_errorLogger.Append("waitForStreams: timeout reached");
 	return ONI_STATUS_TIME_OUT;
 }
@@ -1032,6 +1037,7 @@ void Context::onNewFrame()
 	m_cs.Lock();
 	for (xnl::Hash<XN_THREAD_ID, XN_EVENT_HANDLE>::Iterator it = m_waitingThreads.Begin(); it != m_waitingThreads.End(); ++it)
 	{
+		xnLogVerbose(XN_MASK_ONI_CONTEXT, "Set event %lx", (XnUInt32)it->Value());
 		xnOSSetEvent(it->Value());
 	}
 	m_cs.Unlock();
