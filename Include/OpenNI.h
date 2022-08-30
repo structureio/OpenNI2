@@ -800,8 +800,30 @@ public:
 	}
 
 	/**
-	Read the next frame from this video stream, delivered as a @ref VideoFrameRef.  This is the primary
-	method for manually obtaining frames of video data.  
+	Get the current frame from this video stream without any side effect or blocking, delivered as a @ref VideoFrameRef.
+	Call this after using @ref OpenNI::waitForAnyStream() to wait for new frames from several streams.
+	Alternatively, use @ref VideoStream::Listener to implement an event driven architecture
+	and call this in the callback method to get the frame from the stream.
+
+	@param [out] pFrame Pointer to a @ref VideoFrameRef object to hold the reference to the new frame.
+	@returns Status code to indicated success or failure of this function.
+	*/
+	Status peekFrame(VideoFrameRef* pFrame)
+	{
+		if (!isValid())
+		{
+			return STATUS_ERROR;
+		}
+
+		OniFrame* pOniFrame;
+		Status rc = (Status)oniStreamPeekFrame(m_stream, &pOniFrame);
+
+		pFrame->setReference(pOniFrame);
+		return rc;
+	}
+
+	/**
+	Read the next frame from this video stream, delivered as a @ref VideoFrameRef.
 	If no new frame is available, the call will block until one is available.
 	To avoid blocking, use @ref VideoStream::Listener to implement an event driven architecture.  Another
 	alternative is to use @ref OpenNI::waitForAnyStream() to wait for new frames from several streams.

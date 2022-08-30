@@ -5,13 +5,13 @@
   It's not enough to just include newer files.
   -->
   <?define MajorVersion=2?>
-  <?define MinorVersion=2?>
+  <?define MinorVersion=3?>
   <?define MaintenanceVersion=0?>
   <!-- BuildVersion is NOT used by WiX in the upgrade procedure -->
-  <?define BuildVersion=33?>
+  <?define BuildVersion=2?>
   <!-- Full version number to display -->
   <?define VersionNumber="$(var.MajorVersion).$(var.MinorVersion).$(var.MaintenanceVersion).$(var.BuildVersion)"?>
-  <?define VersionName="2.2"?>
+  <?define VersionName="2.3"?>
 
   <!--
   Path to the resources directory. resources don't really need to be included

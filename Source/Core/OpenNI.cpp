@@ -263,6 +263,17 @@ ONI_C_API void oniStreamStop(OniStreamHandle stream)
 	stream->pStream->stop();
 }
 
+ONI_C_API OniStatus oniStreamPeekFrame(OniStreamHandle stream, OniFrame** pFrame)
+{
+    OniStatus result = ONI_STATUS_ERROR;
+    if (stream && stream->pStream && pFrame)
+    {
+        *pFrame = g_Context.peekFrame(stream);
+        result = ONI_STATUS_OK;
+    }
+	return result;
+}
+
 ONI_C_API OniStatus oniStreamReadFrame(OniStreamHandle stream, OniFrame** pFrame)
 {
 	g_Context.clearErrorLogger();

@@ -106,6 +106,9 @@ ONI_C_API OniStatus oniStreamStart(OniStreamHandle stream);
 /** Stop generating data from the stream. */
 ONI_C_API void oniStreamStop(OniStreamHandle stream);
 
+/** Get the current frame held by the stream without any side effect or blocking. For use in an onNewFrame() callback and after a successful oniWaitForStreams(). */
+ONI_C_API OniStatus oniStreamPeekFrame(OniStreamHandle stream, OniFrame** pFrame);
+
 /** Get the next frame from the stream. This function is blocking until there is a new frame from the stream. For timeout, use oniWaitForStreams() first */
 ONI_C_API OniStatus oniStreamReadFrame(OniStreamHandle stream, OniFrame** pFrame);
 

@@ -624,6 +624,15 @@ OniStatus Context::streamDestroy(VideoStream* pStream)
 	return rc;
 }
 
+OniFrame* Context::peekFrame(OniStreamHandle stream)
+{
+    VideoStream* pStream = ((_OniStream*)stream)->pStream;
+    pStream->lockFrame();
+    OniFrame* pFrame = pStream->peekFrame();
+    pStream->unlockFrame();
+    return pFrame;
+}
+
 OniStatus Context::readFrame(OniStreamHandle stream, OniFrame** pFrame)
 {
 	// Make sure frame is available.
@@ -741,10 +750,10 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 				timeToWait = timeout - (int)passedTime;
 			else
 				timeToWait = 0;
-			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait %d for event %lx", timeToWait, (XnUInt32)hEvent);
+			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait %d for event %lx", timeToWait, reinterpret_cast<size_t>(hEvent));
 		}
 		else
-			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait for event %lx", (XnUInt32)hEvent);
+			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait for event %lx", reinterpret_cast<size_t>(hEvent));
 	} while (XN_STATUS_OK == xnOSWaitEvent(hEvent, timeToWait));
 	
 	xnOSStopTimer(&workTimer);
@@ -1037,7 +1046,7 @@ void Context::onNewFrame()
 	m_cs.Lock();
 	for (xnl::Hash<XN_THREAD_ID, XN_EVENT_HANDLE>::Iterator it = m_waitingThreads.Begin(); it != m_waitingThreads.End(); ++it)
 	{
-		xnLogVerbose(XN_MASK_ONI_CONTEXT, "Set event %lx", (XnUInt32)it->Value());
+		xnLogVerbose(XN_MASK_ONI_CONTEXT, "Set event %lx", reinterpret_cast<size_t>(it->Value()));
 		xnOSSetEvent(it->Value());
 	}
 	m_cs.Unlock();
