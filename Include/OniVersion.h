@@ -22,7 +22,7 @@
 
 #define ONI_VERSION_MAJOR	2
 #define ONI_VERSION_MINOR	3
-#define ONI_VERSION_MAINTENANCE	0
+#define ONI_VERSION_MAINTENANCE	1
 #define ONI_VERSION_BUILD	2
 
 /** OpenNI version (in brief string format): "Major.Minor.Maintenance (Build)" */ 
