@@ -26,7 +26,7 @@
 static const char* ONI_CONFIGURATION_FILE = "OpenNI.ini";
 static const char* ONI_DEFAULT_DRIVERS_REPOSITORY = "OpenNI2" XN_FILE_DIR_SEP "Drivers";
 
-#define XN_MASK_ONI_CONTEXT "OniContext"
+#define XN_MASK_ONI_CONTEXT "ONI"
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN
 

@@ -54,7 +54,7 @@ void XnLogFileWriter::WriteEntry(const XnLogEntry* pEntry)
 
 	XnUInt32 nMessageLen = 0;
 	XnUInt32 nChars = 0;
-	xnOSStrFormat(strBuffer + nMessageLen, nMaxMessageSize - nMessageLen, &nChars, "%9llu\t[0x%x]\t%-10s\t%s\t", pEntry->nTimestamp, (unsigned)tid, pEntry->strSeverity, pEntry->strMask);
+	xnOSStrFormat(strBuffer + nMessageLen, nMaxMessageSize - nMessageLen, &nChars, "%9llu\t[0x%.8x]\t%-10s\t%s\t", pEntry->nTimestamp, (unsigned)tid, pEntry->strSeverity, pEntry->strMask);
 	nMessageLen += nChars;
 
 	if (m_bWriteLineInfo)
