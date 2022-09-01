@@ -815,7 +815,7 @@ public:
 			return STATUS_ERROR;
 		}
 
-		OniFrame* pOniFrame;
+		OniFrame* pOniFrame = NULL;
 		Status rc = (Status)oniStreamPeekFrame(m_stream, &pOniFrame);
 
 		pFrame->setReference(pOniFrame);
