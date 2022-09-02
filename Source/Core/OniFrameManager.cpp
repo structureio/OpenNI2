@@ -56,7 +56,7 @@ void FrameManager::release(OniFrame* pFrame)
 	OniFrameInternal* pInternal = (OniFrameInternal*)pFrame;
 	m_frames.Lock();
 	xnLogVerbose(XN_MASK_ONI_FRAME_MANAGER, "Dec %d @ %p", pInternal->refCount, (void*)pInternal);
-	if (--pInternal->refCount <= 0)
+	if (--pInternal->refCount == 0)
 	{
 		// notify frame is back to pool
         if (pInternal->backToPoolFunc != NULL)

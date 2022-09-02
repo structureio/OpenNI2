@@ -113,6 +113,7 @@ typedef struct
 } OniFrame;
 
 typedef void (ONI_CALLBACK_TYPE* OniNewFrameCallback)(OniStreamHandle stream, void* pCookie);
+typedef void (ONI_CALLBACK_TYPE* OniProcessFrameCallback)(OniFrame* frame, void* pCookie);
 typedef void (ONI_CALLBACK_TYPE* OniGeneralCallback)(void* pCookie);
 typedef void (ONI_CALLBACK_TYPE* OniDeviceInfoCallback)(const OniDeviceInfo* pInfo, void* pCookie);
 typedef void (ONI_CALLBACK_TYPE* OniDeviceStateCallback)(const OniDeviceInfo* pInfo, OniDeviceState deviceState, void* pCookie);

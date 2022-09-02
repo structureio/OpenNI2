@@ -596,11 +596,12 @@ public:
 	/** @internal */
 	void _setFrame(OniFrame* pFrame)
 	{
-		setReference(pFrame);
 		if (pFrame != NULL)
 		{
 			oniFrameAddRef(pFrame);
 		}
+		release();
+		m_pFrame = pFrame;
 	}
 
 	/** @internal */
@@ -611,11 +612,10 @@ public:
 
 private:
 	friend class VideoStream;
-	inline void setReference(OniFrame* pFrame)
+	static void ONI_CALLBACK_TYPE setReference(OniFrame* pFrame, void* pCookie)
 	{
-		// Initial - don't addref. This is the reference from OpenNI
-		release();
-		m_pFrame = pFrame;
+		VideoFrameRef* pRef = (VideoFrameRef*)pCookie;
+		pRef->_setFrame(pFrame);
 	}
 
 	OniFrame* m_pFrame; // const!!?
@@ -808,18 +808,14 @@ public:
 	@param [out] pFrame Pointer to a @ref VideoFrameRef object to hold the reference to the new frame.
 	@returns Status code to indicated success or failure of this function.
 	*/
-	Status peekFrame(VideoFrameRef* pFrame)
+	Status peekFrame(VideoFrameRef* pFrameRef)
 	{
 		if (!isValid())
 		{
 			return STATUS_ERROR;
 		}
 
-		OniFrame* pOniFrame = NULL;
-		Status rc = (Status)oniStreamPeekFrame(m_stream, &pOniFrame);
-
-		pFrame->setReference(pOniFrame);
-		return rc;
+		return (Status)oniStreamPeekFrame(m_stream, VideoFrameRef::setReference, pFrameRef);
 	}
 
 	/**
@@ -831,7 +827,7 @@ public:
 	@param [out] pFrame Pointer to a @ref VideoFrameRef object to hold the reference to the new frame.
 	@returns Status code to indicated success or failure of this function.
 	*/
-	Status readFrame(VideoFrameRef* pFrame)
+	Status readFrame(VideoFrameRef* pFrameRef)
 	{
 		if (!isValid())
 		{
@@ -841,7 +837,7 @@ public:
 		OniFrame* pOniFrame;
 		Status rc = (Status)oniStreamReadFrame(m_stream, &pOniFrame);
 
-		pFrame->setReference(pOniFrame);
+		VideoFrameRef::setReference(pOniFrame, pFrameRef);
 		return rc;
 	}
 

@@ -81,7 +81,7 @@ public:
 
 	const OniSensorInfo* getSensorInfo(OniStreamHandle stream);
 
-	OniFrame* peekFrame(OniStreamHandle stream);
+	OniStatus peekFrame(OniStreamHandle stream, OniProcessFrameCallback handler, void* pCookie);
 	OniStatus readFrame(OniStreamHandle stream, OniFrame** pFrame);
 
 	void frameRelease(OniFrame* pFrame);

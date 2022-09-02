@@ -624,13 +624,18 @@ OniStatus Context::streamDestroy(VideoStream* pStream)
 	return rc;
 }
 
-OniFrame* Context::peekFrame(OniStreamHandle stream)
+OniStatus Context::peekFrame(OniStreamHandle stream, OniProcessFrameCallback handler, void* pCookie)
 {
+    if (!stream || !stream->pStream)
+    {
+		return ONI_STATUS_ERROR;
+	}
+
     VideoStream* pStream = ((_OniStream*)stream)->pStream;
     pStream->lockFrame();
-    OniFrame* pFrame = pStream->peekFrame();
+    handler(pStream->peekFrame(), pCookie);
     pStream->unlockFrame();
-    return pFrame;
+    return ONI_STATUS_OK;
 }
 
 OniStatus Context::readFrame(OniStreamHandle stream, OniFrame** pFrame)
