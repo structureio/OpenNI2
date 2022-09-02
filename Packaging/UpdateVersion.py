@@ -26,9 +26,9 @@ import stat
 from datetime import date
 
 VERSION_MAJOR = 2
-VERSION_MINOR = 2
+VERSION_MINOR = 3
 VERSION_MAINTENANCE = 0
-VERSION_BUILD = 33
+VERSION_BUILD = 0
 
 def getVersionString():
     return str(VERSION_MAJOR) + "." + str(VERSION_MINOR) + "." + str(VERSION_MAINTENANCE) + "." + str(VERSION_BUILD)
@@ -58,7 +58,7 @@ def update():
         print ("Illegal build version")
         sys.exit()
 
-    print "Going to update files to version: " + getVersionString()
+    print ("Going to update files to version: " + getVersionString())
 
     update_self_defs("./UpdateVersion.py")
     update_src_ver_defs("../Include/OniVersion.h")

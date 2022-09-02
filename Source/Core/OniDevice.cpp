@@ -147,7 +147,7 @@ VideoStream* Device::createStream(OniSensorType sensorType)
 
 	{
 		// check if stream already exists. Do this in a lock to make it thread-safe
-		xnl::AutoCSLocker lock(m_sensors[sensorType]->m_refCountCS);
+		xnl::AutoCSLocker sensor_lock(m_sensors[sensorType]->m_refCountCS);
 		if (m_sensors[sensorType]->m_streamCount == 0)
 		{
 			void* streamHandle = m_driverHandler.deviceCreateStream(m_deviceHandle, sensorType);

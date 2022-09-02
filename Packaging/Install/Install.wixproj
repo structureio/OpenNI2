@@ -8,7 +8,7 @@
     <ProductVersion>3.5</ProductVersion>
     <ProjectGuid>{baeb9c48-562c-4d56-a6cd-18932265480a}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>OpenNI-Windows-$(Platform)-2.2</OutputName>
+    <OutputName>OpenNI-Windows-$(Platform)-2.3</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>

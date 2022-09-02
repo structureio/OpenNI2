@@ -54,7 +54,7 @@ class Harvest:
         elif self.osName == 'Darwin':
             shutil.copy(os.path.join(sourceDir, 'lib' + name + '.dylib'), targetDir)
         else:
-            raise 'Unsupported platform!'
+            raise Execption('Unsupported platform!')
             
     def copyExecutable(self, sourceDir, name, targetDir):
         if self.osName == 'Windows':
@@ -335,7 +335,7 @@ $(OUTPUT_FILE): copy-redist
             shutil.copy(os.path.join(self.rootDir, 'Packaging', 'Linux', 'primesense-usb.rules'), self.outDir)
 
 if len(sys.argv) < 3:
-    print 'Usage: ' + sys.argv[0] + ' <OutDir> <x86|x64|Arm>'
+    print('Usage: ' + sys.argv[0] + ' <OutDir> <x86|x64|Arm>')
     exit(1)
     
 rootDir = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..'))

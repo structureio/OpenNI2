@@ -275,10 +275,10 @@ public:
 	@param [in] resolutionX Desired new horizontal resolution in pixels.
 	@param [in] resolutionY Desired new vertical resolution in pixels.
 	*/
-	void setResolution(int resolutionX, int resolutionY)
+	void setResolution(int _resolutionX, int _resolutionY)
 	{
-		this->resolutionX = resolutionX;
-		this->resolutionY = resolutionY;
+		this->resolutionX = _resolutionX;
+		this->resolutionY = _resolutionY;
 	}
 
 	/**
@@ -287,7 +287,7 @@ public:
 	video modes.
 	@param [in] fps Desired new frame rate, measured in frames per second.
 	*/
-	void setFps(int fps) { this->fps = fps; }
+	void setFps(int _fps) { this->fps = _fps; }
 
 	friend class SensorInfo;
 	friend class VideoStream;
@@ -596,11 +596,12 @@ public:
 	/** @internal */
 	void _setFrame(OniFrame* pFrame)
 	{
-		setReference(pFrame);
 		if (pFrame != NULL)
 		{
 			oniFrameAddRef(pFrame);
 		}
+		release();
+		m_pFrame = pFrame;
 	}
 
 	/** @internal */
@@ -611,11 +612,10 @@ public:
 
 private:
 	friend class VideoStream;
-	inline void setReference(OniFrame* pFrame)
+	static void ONI_CALLBACK_TYPE setReference(OniFrame* pFrame, void* pCookie)
 	{
-		// Initial - don't addref. This is the reference from OpenNI
-		release();
-		m_pFrame = pFrame;
+		VideoFrameRef* pRef = (VideoFrameRef*)pCookie;
+		pRef->_setFrame(pFrame);
 	}
 
 	OniFrame* m_pFrame; // const!!?
@@ -800,8 +800,26 @@ public:
 	}
 
 	/**
-	Read the next frame from this video stream, delivered as a @ref VideoFrameRef.  This is the primary
-	method for manually obtaining frames of video data.  
+	Get the current frame from this video stream without any side effect or blocking, delivered as a @ref VideoFrameRef.
+	Call this after using @ref OpenNI::waitForAnyStream() to wait for new frames from several streams.
+	Alternatively, use @ref VideoStream::Listener to implement an event driven architecture
+	and call this in the callback method to get the frame from the stream.
+
+	@param [out] pFrame Pointer to a @ref VideoFrameRef object to hold the reference to the new frame.
+	@returns Status code to indicated success or failure of this function.
+	*/
+	Status peekFrame(VideoFrameRef* pFrameRef)
+	{
+		if (!isValid())
+		{
+			return STATUS_ERROR;
+		}
+
+		return (Status)oniStreamPeekFrame(m_stream, VideoFrameRef::setReference, pFrameRef);
+	}
+
+	/**
+	Read the next frame from this video stream, delivered as a @ref VideoFrameRef.
 	If no new frame is available, the call will block until one is available.
 	To avoid blocking, use @ref VideoStream::Listener to implement an event driven architecture.  Another
 	alternative is to use @ref OpenNI::waitForAnyStream() to wait for new frames from several streams.
@@ -809,7 +827,7 @@ public:
 	@param [out] pFrame Pointer to a @ref VideoFrameRef object to hold the reference to the new frame.
 	@returns Status code to indicated success or failure of this function.
 	*/
-	Status readFrame(VideoFrameRef* pFrame)
+	Status readFrame(VideoFrameRef* pFrameRef)
 	{
 		if (!isValid())
 		{
@@ -819,7 +837,7 @@ public:
 		OniFrame* pOniFrame;
 		Status rc = (Status)oniStreamReadFrame(m_stream, &pOniFrame);
 
-		pFrame->setReference(pOniFrame);
+		VideoFrameRef::setReference(pOniFrame, pFrameRef);
 		return rc;
 	}
 

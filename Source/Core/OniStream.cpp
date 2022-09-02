@@ -442,8 +442,8 @@ void VideoStream::refreshWorldConversionCache()
 	getProperty(ONI_STREAM_PROPERTY_HORIZONTAL_FOV, &horizontalFov, &size);
 	getProperty(ONI_STREAM_PROPERTY_VERTICAL_FOV, &verticalFov, &size);
 
-	m_worldConvertCache.xzFactor = tan(horizontalFov / 2) * 2;
-	m_worldConvertCache.yzFactor = tan(verticalFov / 2) * 2;
+	m_worldConvertCache.xzFactor = (XnFloat)tan(horizontalFov / 2) * 2;
+	m_worldConvertCache.yzFactor = (XnFloat)tan(verticalFov / 2) * 2;
 	m_worldConvertCache.resolutionX = videoMode.resolutionX;
 	m_worldConvertCache.resolutionY = videoMode.resolutionY;
 	m_worldConvertCache.halfResX = m_worldConvertCache.resolutionX / 2;

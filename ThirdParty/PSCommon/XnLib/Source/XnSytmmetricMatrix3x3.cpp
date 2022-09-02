@@ -48,11 +48,11 @@ Vector3D SymmetricMatrix3x3::GetEigenValuesNoScaling() const
 	XnFloat a02_sqr = Math::Sqr(m_x02);
 	XnFloat a12_sqr = Math::Sqr(m_x12);
 	XnFloat p = (XnFloat)Math::ONE_SIXTH * (a00*a00+a11*a11+a22*a22 + 2*(a01_sqr+a02_sqr+a12_sqr));
-	XnFloat q = (XnFloat).5*(a00*(a11*a22-a12_sqr)-a11*a02_sqr-a22*a01_sqr) + m_x01*m_x02*m_x12;
+	XnFloat q = XnFloat(0.5)*(a00*(a11*a22-a12_sqr)-a11*a02_sqr-a22*a01_sqr) + m_x01*m_x02*m_x12;
 	XnFloat sqrt_p = Math::Sqrt(p), disc = p*p*p-q*q;
-	XnFloat phi = (XnFloat)Math::ONE_THIRD*atan2(Math::Sqrt(Math::Max((XnFloat)0,disc)),q);
-	XnFloat c=cos(phi) , s=sin(phi);
-	XnFloat sqrt_p_cos = sqrt_p*c, root_three_sqrt_p_sin = (XnFloat)Math::ROOT_THREE*sqrt_p*s;
+	XnFloat phi = XnFloat(Math::ONE_THIRD)*(XnFloat)atan2(Math::Sqrt(Math::Max((XnFloat)0,disc)),q);
+	XnFloat c= (XnFloat)cos(phi) , s= (XnFloat)sin(phi);
+	XnFloat sqrt_p_cos = sqrt_p*c, root_three_sqrt_p_sin = XnFloat(Math::ROOT_THREE)*sqrt_p*s;
 	Vector3D lambda(m+2*sqrt_p_cos, m-sqrt_p_cos-root_three_sqrt_p_sin, m-sqrt_p_cos+root_three_sqrt_p_sin);
 	Math::ExchangeSort(lambda.z, lambda.y, lambda.x);
 	return lambda;

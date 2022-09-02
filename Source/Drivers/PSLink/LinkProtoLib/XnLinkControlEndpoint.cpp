@@ -517,7 +517,7 @@ XnStatus LinkControlEndpoint::DownloadFile(XnUInt16 zone, const XnChar* fwFileNa
 
 	while (!isLast)
 	{
-		XnUInt32 nResponseSize = m_nMaxResponseSize;
+		nResponseSize = m_nMaxResponseSize;
 		nRetVal = ContinueResponseImpl(XN_LINK_MSG_DOWNLOAD_FILE, 0, m_pIncomingResponse, nResponseSize, isLast);
 		if (nRetVal != XN_STATUS_OK)
 		{

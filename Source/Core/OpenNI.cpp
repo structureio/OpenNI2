@@ -263,6 +263,11 @@ ONI_C_API void oniStreamStop(OniStreamHandle stream)
 	stream->pStream->stop();
 }
 
+ONI_C_API OniStatus oniStreamPeekFrame(OniStreamHandle stream, OniProcessFrameCallback handler, void* pCookie)
+{
+    return g_Context.peekFrame(stream, handler, pCookie);
+}
+
 ONI_C_API OniStatus oniStreamReadFrame(OniStreamHandle stream, OniFrame** pFrame)
 {
 	g_Context.clearErrorLogger();

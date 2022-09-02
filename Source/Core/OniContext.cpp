@@ -26,7 +26,7 @@
 static const char* ONI_CONFIGURATION_FILE = "OpenNI.ini";
 static const char* ONI_DEFAULT_DRIVERS_REPOSITORY = "OpenNI2" XN_FILE_DIR_SEP "Drivers";
 
-#define XN_MASK_ONI_CONTEXT "OniContext"
+#define XN_MASK_ONI_CONTEXT "ONI"
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN
 
@@ -420,11 +420,11 @@ OniStatus Context::deviceOpen(const char* uri, const char* mode, OniDeviceHandle
 		{
 			if ((*iter)->tryDevice(deviceURI))
 			{
-				for (xnl::List<Device*>::Iterator iter = m_devices.Begin(); iter != m_devices.End(); ++iter)
+				for (xnl::List<Device*>::Iterator devIter = m_devices.Begin(); devIter != m_devices.End(); ++devIter)
 				{
-					if (xnOSStrCmp((*iter)->getInfo()->uri, deviceURI) == 0)
+					if (xnOSStrCmp((*devIter)->getInfo()->uri, deviceURI) == 0)
 					{
-						pMyDevice = *iter;
+						pMyDevice = *devIter;
 						break;
 					}
 				}
@@ -624,6 +624,20 @@ OniStatus Context::streamDestroy(VideoStream* pStream)
 	return rc;
 }
 
+OniStatus Context::peekFrame(OniStreamHandle stream, OniProcessFrameCallback handler, void* pCookie)
+{
+    if (!stream || !stream->pStream)
+    {
+		return ONI_STATUS_ERROR;
+	}
+
+    VideoStream* pStream = ((_OniStream*)stream)->pStream;
+    pStream->lockFrame();
+    handler(pStream->peekFrame(), pCookie);
+    pStream->unlockFrame();
+    return ONI_STATUS_OK;
+}
+
 OniStatus Context::readFrame(OniStreamHandle stream, OniFrame** pFrame)
 {
 	// Make sure frame is available.
@@ -670,6 +684,7 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 	{
 		if (pStreams[i] == NULL)
 		{
+            streamsList[i] = NULL;
 			continue;
 		}
 
@@ -740,16 +755,22 @@ OniStatus Context::waitForStreams(OniStreamHandle* pStreams, int streamCount, in
 				timeToWait = timeout - (int)passedTime;
 			else
 				timeToWait = 0;
+			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait %d for event %lx", timeToWait, reinterpret_cast<size_t>(hEvent));
 		}
+		else
+			xnLogVerbose(XN_MASK_ONI_CONTEXT, "Wait for event %lx", reinterpret_cast<size_t>(hEvent));
 	} while (XN_STATUS_OK == xnOSWaitEvent(hEvent, timeToWait));
 	
 	xnOSStopTimer(&workTimer);
+	releaseThreadEvent();
 
 	if (oldestIndex != -1)
 	{
+		xnLogVerbose(XN_MASK_ONI_CONTEXT, "Stream index %d", oldestIndex);
 		return ONI_STATUS_OK;
 	}
 
+	xnLogVerbose(XN_MASK_ONI_CONTEXT, "Timeout");
 	m_errorLogger.Append("waitForStreams: timeout reached");
 	return ONI_STATUS_TIME_OUT;
 }
@@ -1030,6 +1051,7 @@ void Context::onNewFrame()
 	m_cs.Lock();
 	for (xnl::Hash<XN_THREAD_ID, XN_EVENT_HANDLE>::Iterator it = m_waitingThreads.Begin(); it != m_waitingThreads.End(); ++it)
 	{
+		xnLogVerbose(XN_MASK_ONI_CONTEXT, "Set event %lx", reinterpret_cast<size_t>(it->Value()));
 		xnOSSetEvent(it->Value());
 	}
 	m_cs.Unlock();
@@ -1049,15 +1071,31 @@ XN_EVENT_HANDLE Context::getThreadEvent()
 
 	m_cs.Lock();
 	
-	if (XN_STATUS_OK != m_waitingThreads.Get(tid, hEvent))
+	if (XN_STATUS_OK != m_knownThreads.Get(tid, hEvent))
 	{
 		xnOSCreateEvent(&hEvent, FALSE);
-		m_waitingThreads.Set(tid, hEvent);
+		m_knownThreads.Set(tid, hEvent);
 	}
+	m_waitingThreads.Set(tid, hEvent);
 
 	m_cs.Unlock();
 
 	return hEvent;
+}
+
+void Context::releaseThreadEvent()
+{
+	XN_THREAD_ID tid;
+	xnOSGetCurrentThreadID(&tid);
+
+	m_cs.Lock();
+	auto pEntry = m_waitingThreads.Find(tid);
+	if (m_waitingThreads.End() != pEntry)
+	{
+		m_waitingThreads.Remove(pEntry);
+	}
+
+	m_cs.Unlock();
 }
 
 ONI_NAMESPACE_IMPLEMENTATION_END

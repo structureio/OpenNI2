@@ -1,5 +1,7 @@
 #include "OniFrameManager.h"
 #include <XnOSCpp.h>
+#include <XnLog.h>
+#define XN_MASK_ONI_FRAME_MANAGER "MGR"
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN
 
@@ -36,6 +38,7 @@ OniFrameInternal* FrameManager::acquireFrame()
 	pFrame->refCount = 1; // this is the only reference
 	pFrame->freeBufferFunc = NULL;
 	pFrame->freeBufferFuncCookie = NULL;
+	xnLogVerbose(XN_MASK_ONI_FRAME_MANAGER, "Set %d @ %p", pFrame->refCount, (void*)pFrame);
 
 	return pFrame;
 }
@@ -44,14 +47,15 @@ void FrameManager::addRef(OniFrame* pFrame)
 {
 	OniFrameInternal* pInternal = (OniFrameInternal*)pFrame;
 	m_frames.Lock();
+	xnLogVerbose(XN_MASK_ONI_FRAME_MANAGER, "Inc %d @ %p", pInternal->refCount, (void*)pInternal);
 	++pInternal->refCount;
 	m_frames.Unlock();
 }
-
 void FrameManager::release(OniFrame* pFrame)
 {
 	OniFrameInternal* pInternal = (OniFrameInternal*)pFrame;
 	m_frames.Lock();
+	xnLogVerbose(XN_MASK_ONI_FRAME_MANAGER, "Dec %d @ %p", pInternal->refCount, (void*)pInternal);
 	if (--pInternal->refCount == 0)
 	{
 		// notify frame is back to pool

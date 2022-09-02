@@ -49,10 +49,12 @@ void XnLogFileWriter::WriteEntry(const XnLogEntry* pEntry)
 	// write timestamp and severity
 	const XnUInt32 nMaxMessageSize = 2047;
 	XnChar strBuffer[nMaxMessageSize + 1];
+	XN_THREAD_ID tid;
+	xnOSGetCurrentThreadID(&tid);
 
 	XnUInt32 nMessageLen = 0;
 	XnUInt32 nChars = 0;
-	xnOSStrFormat(strBuffer + nMessageLen, nMaxMessageSize - nMessageLen, &nChars, "%9llu\t%-10s\t%s\t", pEntry->nTimestamp, pEntry->strSeverity, pEntry->strMask);
+	xnOSStrFormat(strBuffer + nMessageLen, nMaxMessageSize - nMessageLen, &nChars, "%9llu\t[0x%.8x]\t%-10s\t%s\t", pEntry->nTimestamp, (unsigned)tid, pEntry->strSeverity, pEntry->strMask);
 	nMessageLen += nChars;
 
 	if (m_bWriteLineInfo)

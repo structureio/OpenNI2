@@ -63,7 +63,7 @@ XnUSBEventCallbackList g_connectivityEvent;
 DWORD __stdcall DevDetectThread(LPVOID Arg)
 {
 	char className[MAX_PATH];
-	sprintf_s(className, "xnUsbDeviceDetector%x", &g_xnUsbhModule);
+	sprintf_s(className, "xnUsbDeviceDetector%p", &g_xnUsbhModule);
 
 	g_xnUsbhDevDetectWnd = CreateWindow(className, "", WS_POPUP, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
 
@@ -302,7 +302,7 @@ XnStatus xnUSBPlatformSpecificInit()
 
 	// give a unique class name (there might be multiple instances of this code in multiple DLLs)
 	char className[MAX_PATH];
-	sprintf_s(className, "xnUsbDeviceDetector%x", &g_xnUsbhModule);
+	sprintf_s(className, "xnUsbDeviceDetector%p", &g_xnUsbhModule);
 
 	WNDCLASS wc;
 	wc.style = 0;
